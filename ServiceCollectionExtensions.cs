@@ -1,4 +1,5 @@
-﻿using Eduhunt.Applications.Cvs;
+﻿using Eduhunt.Applications.ApplicactionUsers;
+using Eduhunt.Applications.Cvs;
 
 namespace Eduhunt
 {
@@ -7,6 +8,7 @@ namespace Eduhunt
         public static IServiceCollection AddAllCustomServices(this IServiceCollection services)
         {
             services.AddScoped<CvService>();
+            services.AddScoped<ApplicationUserService>();
 
             return services;
         }
