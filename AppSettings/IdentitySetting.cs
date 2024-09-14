@@ -2,7 +2,7 @@
 {
     public class IdentitySetting
     {
-        public const string IdentitySettingName = "IdentitySettings";
+        public const string IdentitySettingName = "IdentitySetting";
         public bool RequireConfirmedAccount { get; set; }
         public bool RequireDigit { get; set; }
         public int RequiredLength { get; set; }
