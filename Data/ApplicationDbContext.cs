@@ -1,10 +1,11 @@
 ﻿using Eduhunt.Models.Configurations;
 using Eduhunt.Models.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Eduhunt.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -18,6 +19,7 @@ namespace Eduhunt.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
             modelBuilder.ApplyConfiguration(new CvConfiguration());
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
