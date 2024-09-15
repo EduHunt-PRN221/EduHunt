@@ -9,7 +9,6 @@
   <ItemGroup>
     <Folder Include="Areas\Admin\Pages\" />
     <Folder Include="Areas\Identity\Pages\" />
-    <Folder Include="DTOs\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +23,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.4" />
+    <PackageReference Include="OpenAI" Version="2.0.0-beta.5" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.18.1" />
   </ItemGroup>
 
 </Project>
