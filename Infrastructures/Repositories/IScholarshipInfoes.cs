@@ -1,9 +1,9 @@
-﻿using EDUHUNT_BE.DTOs;
-using EDUHUNT_BE.Models;
+﻿using Eduhunt.DTOs;
+using Eduhunt.Models;
 using Microsoft.AspNetCore.Mvc;
-using static EDUHUNT_BE.DTOs.ServiceResponses;
+using static Eduhunt.DTOs.ServiceResponses;
 
-namespace EDUHUNT_BE.Interfaces
+namespace Eduhunt.Interfaces
 {
     public interface IScholarshipInfoes
     {
