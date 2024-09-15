@@ -23,13 +23,11 @@ public class ScholarshipRepository : IScholarship
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly string _apiKey;
-    private readonly ISurvey _surveyRepository;
 
-    public ScholarshipRepository(ApplicationDbContext dbContext, IConfiguration configuration, ISurvey surveyRepository)
+    public ScholarshipRepository(ApplicationDbContext dbContext, IConfiguration configuration)
     {
         _dbContext = dbContext;
         _apiKey = configuration["ChatGPT:Key"];
-        _surveyRepository = surveyRepository;
     }
 
     public async Task<List<Scholarship>> GetRecommendedScholarships(string userId)

@@ -1,11 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Eduhunt.Models.Contracts;
+using System.ComponentModel.DataAnnotations;
 
 namespace EDUHUNT_BE.Models
 {
-    public class Scholarship
+    public class Scholarship : _Base
     {
-        public Guid Id { get; set; }
-
         [Required]
         public string Budget { get; set; }
 
