@@ -1,16 +1,13 @@
 ﻿using Eduhunt.Data;
+using Eduhunt.DTOs;
+using Eduhunt.Infrastructures.Repositories;
+using EDUHUNT_BE.Models;
+using OpenAI.Chat;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenAI.Chat;
 using System.ClientModel;
-using Eduhunt.DTOs;
-using EDUHUNT_BE.Models;
-using System.Text;
 using System.Collections.Concurrent;
-using Microsoft.EntityFrameworkCore;
-using Eduhunt.Infrastructures.Repositories;
-using Microsoft.AspNetCore.Hosting.Server;
-using System;
+using System.Text;
 
 public class Url
 {
