@@ -9,13 +9,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new Exception("No default connection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("No default connection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services
     .Configure<IdentitySetting>(builder.Configuration.GetSection(IdentitySetting.IdentitySettingName));
+
+builder.Services
+    .Configure<CloudinarySetting>(builder.Configuration.GetSection(CloudinarySetting.CloudinarySettingName));
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>(options =>
