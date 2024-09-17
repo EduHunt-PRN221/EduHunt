@@ -1,0 +1,26 @@
+﻿@page
+@model Eduhunt.Pages.Identity.Pages.ForgotPassModel
+@{
+    ViewData["Title"] = "Forgot Password";
+}
+
+<h2>Forgot Password</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" type="email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Send Reset Link</button>
+
+    <!-- Display all validation errors here -->
+    <div asp-validation-summary="All" class="text-danger"></div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
