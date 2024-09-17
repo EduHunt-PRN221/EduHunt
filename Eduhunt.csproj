@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Amazon.Extensions.CognitoAuthentication" Version="2.5.5" />
     <PackageReference Include="AutoMapper" Version="13.0.1" />
-    <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.7.403.1" />
+    <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.7.403.2" />
     <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
@@ -22,7 +22,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
 	<PackageReference Include="OpenAI" Version="2.0.0-beta.5" />
-	<PackageReference Include="Selenium.WebDriver" Version="4.18.1" />
+	<PackageReference Include="Selenium.WebDriver" Version="4.24.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>

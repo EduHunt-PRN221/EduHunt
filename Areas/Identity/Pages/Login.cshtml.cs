@@ -1,9 +1,8 @@
+using Amazon;
+using Amazon.CognitoIdentityProvider;
+using Amazon.Extensions.CognitoAuthentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Amazon.Extensions.CognitoAuthentication;
-using Amazon.CognitoIdentityProvider;
-using Amazon;
-using Microsoft.Extensions.Configuration;
 
 namespace Eduhunt.Areas.Identity.Pages
 {
@@ -68,7 +67,6 @@ namespace Eduhunt.Areas.Identity.Pages
                     return Page();
                 }
             }
-
             catch (Exception ex)
             {
                 // Handle errors (e.g., incorrect login details)

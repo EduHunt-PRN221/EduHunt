@@ -1,12 +1,9 @@
+using Amazon;
+using Amazon.CognitoIdentityProvider;
+using Amazon.CognitoIdentityProvider.Model;
+using Amazon.Extensions.CognitoAuthentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Amazon.CognitoIdentityProvider;
-using Amazon.Extensions.CognitoAuthentication;
-using Amazon;
-using Microsoft.Extensions.Configuration;
-using Amazon.CognitoIdentityProvider.Model;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace Eduhunt.Areas.Identity.Pages
 {
@@ -63,7 +60,7 @@ namespace Eduhunt.Areas.Identity.Pages
                 var signUpRequest = new SignUpRequest
                 {
                     ClientId = _configuration["AWS:ClientId"],
-                    Username = Username,
+                    Username = Email,
                     Password = Password,
                     UserAttributes = new List<AttributeType>
                     {
@@ -81,7 +78,7 @@ namespace Eduhunt.Areas.Identity.Pages
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                 {
                     // Registration was successful, redirect to a confirmation page or login page
-                    return RedirectToPage("/ConfirmRegistration", new { username = Username });
+                    return RedirectToPage("/Pages/ConfirmRegistration", new { username = Username, mail = Email });
                 }
                 else
                 {

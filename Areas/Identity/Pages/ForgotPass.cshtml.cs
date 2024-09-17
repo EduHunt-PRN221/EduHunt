@@ -1,12 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Amazon;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Extensions.CognitoAuthentication;
-using Amazon;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Eduhunt.Areas.Identity.Pages
 {
@@ -66,7 +63,7 @@ namespace Eduhunt.Areas.Identity.Pages
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                 {
                     // Redirect to a page where the user can input the confirmation code and new password
-                    return RedirectToPage("/ConfirmForgotPassword", new { email = Email });
+                    return RedirectToPage("/Identity/ConfirmRegistration", new { email = Email });
                 }
                 else
                 {

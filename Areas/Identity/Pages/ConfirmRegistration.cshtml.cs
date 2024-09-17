@@ -1,14 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Amazon;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
-using Amazon.Extensions.CognitoAuthentication;
-using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
-using Amazon;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Eduhunt.Pages.Identity.Pages
+namespace Eduhunt.Areas.Identity.Pages
 {
     public class ConfirmRegistrationModel : PageModel
     {
