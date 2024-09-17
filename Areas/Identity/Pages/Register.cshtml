@@ -1,0 +1,80 @@
+﻿@page
+@model Eduhunt.Areas.Identity.Pages.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center" style="background-color: #BEE9F2;">
+    <div class="row bg-white rounded-3 overflow-hidden" style="width: 80vw; height: 85vh;">
+        <div class="col-md-6 d-none d-md-block p-0">
+            <div class="h-100 w-100 bg-image" style="background-image: url('/images/registerGirl.png'); background-size: cover; background-position: center;"></div>
+        </div>
+        <div class="col-md-6 p-5">
+            <h2 class="text-center mb-4">Create your Account</h2>
+            <form method="post" asp-antiforgery="true">
+                <div class="mb-3">
+                    <label asp-for="Username" class="form-label">Username</label>
+                    <input asp-for="Username" class="form-control" placeholder="Enter your username here" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">Email address</label>
+                    <input asp-for="Email" class="form-control" placeholder="Enter your Email here" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <input asp-for="Password" class="form-control" placeholder="Enter your Password here" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                @* <div class="mb-3">
+                    <label asp-for="Input.ConfirmPassword" class="form-label">Confirm password</label>
+                    <div class="input-group">
+                        <input asp-for="Input.ConfirmPassword" class="form-control" placeholder="Confirm your Password here" />
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                            <i class="bi bi-eye"></i> Show
+                        </button>
+                    </div>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Role" class="form-label">Role</label>
+                    <select asp-for="Input.Role" class="form-select">
+                        <option value="1">Student</option>
+                        <option value="2">Scholarship Provider</option>
+                        <option value="3">Mentor</option>
+                    </select>
+                    <span asp-validation-for="Input.Role" class="text-danger"></span>
+                </div> *@
+
+                <button type="submit" class="btn btn-primary w-100 rounded-pill" style="background-color: #67D0FD; border-color: #67D0FD;">Sign Up</button>
+            </form>
+            <p class="text-center mt-4">
+                Have an account? <a href="/Identity/Login" class="text-decoration-none" style="color: #12B8FF;">Sign in</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            var passwordInput = document.getElementById('Input_ConfirmPassword');
+            var passwordType = passwordInput.type;
+            var toggleButton = this;
+
+            if (passwordType === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.innerHTML = '<i class="bi bi-eye-slash"></i> Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.innerHTML = '<i class="bi bi-eye"></i> Show';
+            }
+        });
+    </script>
+}
