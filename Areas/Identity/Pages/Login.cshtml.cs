@@ -13,10 +13,10 @@ namespace Eduhunt.Areas.Identity.Pages
         private readonly IConfiguration _configuration;
 
         [BindProperty]
-        public string Username { get; set; }
+        public string Username { get; set; } = default!;
 
         [BindProperty]
-        public string Password { get; set; }
+        public string Password { get; set; } = default!;
 
         public LoginModel(IConfiguration configuration)
         {
@@ -67,10 +67,10 @@ namespace Eduhunt.Areas.Identity.Pages
                     return Page();
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
                 // Handle errors (e.g., incorrect login details)
-                ModelState.AddModelError(string.Empty, "An error occurred during the login process.");
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
         }

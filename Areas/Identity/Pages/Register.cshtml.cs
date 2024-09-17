@@ -14,13 +14,13 @@ namespace Eduhunt.Areas.Identity.Pages
         private readonly IConfiguration _configuration;
 
         [BindProperty]
-        public string Username { get; set; }
+        public string Username { get; set; } = default!;
 
         [BindProperty]
-        public string Password { get; set; }
+        public string Password { get; set; } = default!;
 
         [BindProperty]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         public RegisterModel(IConfiguration configuration)
         {
@@ -78,7 +78,7 @@ namespace Eduhunt.Areas.Identity.Pages
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                 {
                     // Registration was successful, redirect to a confirmation page or login page
-                    return RedirectToPage("/Pages/ConfirmRegistration", new { username = Username, mail = Email });
+                    return RedirectToPage("/Identity/Login", new { username = Username, mail = Email });
                 }
                 else
                 {
@@ -89,7 +89,7 @@ namespace Eduhunt.Areas.Identity.Pages
             catch (Exception ex)
             {
                 // Handle errors (e.g., user already exists)
-                ModelState.AddModelError(string.Empty, "An error occurred during the registration process.");
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
         }

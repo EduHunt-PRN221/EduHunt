@@ -12,13 +12,13 @@ namespace Eduhunt.Areas.Identity.Pages
         private readonly IConfiguration _configuration;
 
         [BindProperty]
-        public string Username { get; set; }
+        public string Username { get; set; } = default!;
 
         [BindProperty]
-        public string Emailuser { get; set; }
+        public string Emailuser { get; set; } = default!;
 
         [BindProperty]
-        public string ConfirmationCode { get; set; }
+        public string ConfirmationCode { get; set; } = default!;
 
         public ConfirmRegistrationModel(IConfiguration configuration)
         {
@@ -76,7 +76,7 @@ namespace Eduhunt.Areas.Identity.Pages
             catch (Exception ex)
             {
                 // Handle errors such as invalid confirmation code or network issues
-                ModelState.AddModelError(string.Empty, "An error occurred during the confirmation process.");
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
         }

@@ -1,23 +1,11 @@
-﻿using Eduhunt.Models.Entities;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Eduhunt.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly Eduhunt.Data.ApplicationDbContext _context;
-
-        public IndexModel(Eduhunt.Data.ApplicationDbContext context)
+        public void OnGet()
         {
-            _context = context;
-        }
-
-        public IList<Cv> Cv { get;set; } = default!;
-
-        public async Task OnGetAsync()
-        {
-            Cv = await _context.Cv.ToListAsync();
         }
     }
 }

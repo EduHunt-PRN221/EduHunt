@@ -14,7 +14,7 @@ namespace Eduhunt.Areas.Identity.Pages
         private readonly IConfiguration _configuration;
 
         [BindProperty]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         public ForgotPassModel(IConfiguration configuration)
         {
@@ -74,7 +74,7 @@ namespace Eduhunt.Areas.Identity.Pages
             catch (Exception ex)
             {
                 // Handle exceptions such as user not found or service issues
-                ModelState.AddModelError(string.Empty, "An error occurred while trying to reset the password.");
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
         }

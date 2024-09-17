@@ -6,25 +6,25 @@ namespace EDUHUNT_BE.Models
     public class Scholarship : _Base
     {
         [Required]
-        public string Budget { get; set; }
+        public string? Budget { get; set; }
 
         [Required]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         [Required]
-        public string Location { get; set; }
+        public string? Location { get; set; }
 
         [Required]
-        public string SchoolName { get; set; }
+        public string? SchoolName { get; set; }
 
         [Required]
-        public string Level { get; set; }
+        public string? Level { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         #nullable enable
         public string? AuthorId { get; set; }

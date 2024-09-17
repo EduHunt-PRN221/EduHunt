@@ -8,6 +8,6 @@ namespace EDUHUNT_BE.Models
 
         public int CategoryId { get; set; }
 
-        public virtual Category Category { get; set; }
+        public virtual Category? Category { get; set; }
     }
 }
