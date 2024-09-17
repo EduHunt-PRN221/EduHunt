@@ -27,7 +27,7 @@ namespace Eduhunt.Infrastructures.Repositories
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new Exception("Unable to process, id is null");
+                throw new ArgumentNullException(nameof(id));
             }
 
             var entity = await _context.Set<T>()
@@ -45,7 +45,7 @@ namespace Eduhunt.Infrastructures.Repositories
             }
             else
             {
-                throw new Exception("Unable to process, entity is null");
+                throw new ArgumentNullException(nameof(entity));
             }
         }
 
@@ -58,7 +58,7 @@ namespace Eduhunt.Infrastructures.Repositories
             }
             else
             {
-                throw new Exception("Unable to process, entity is null");
+                throw new ArgumentNullException(nameof(entity));
             }
         }
 
@@ -66,7 +66,7 @@ namespace Eduhunt.Infrastructures.Repositories
         {
             if (string.IsNullOrEmpty(id))
             {
-                throw new Exception("Unable to process, id is null");
+                throw new ArgumentNullException(nameof(id));
             }
 
             var entity = await _context.Set<T>()
