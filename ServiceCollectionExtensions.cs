@@ -10,7 +10,7 @@ namespace Eduhunt
         {
             services.AddScoped<CvService>();
             services.AddScoped<ApplicationUserService>();
-            services.AddScoped<CloudinaryService>();
+           // services.AddScoped<CloudinaryService>();
 
             return services;
         }

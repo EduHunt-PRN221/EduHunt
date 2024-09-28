@@ -13,7 +13,7 @@ namespace Eduhunt.Areas.Identity.Pages
         private readonly IConfiguration _configuration;
 
         [BindProperty]
-        public string Username { get; set; } = default!;
+        public string Username { get; set; } = default!;  // This should be email used as username
 
         [BindProperty]
         public string Password { get; set; } = default!;
@@ -45,6 +45,7 @@ namespace Eduhunt.Areas.Identity.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Here, we assume Username is the email, which Cognito can treat as the username
             var user = new CognitoUser(Username, _configuration["AWS:ClientId"], _userPool, _provider);
 
             var authRequest = new InitiateSrpAuthRequest
@@ -54,11 +55,15 @@ namespace Eduhunt.Areas.Identity.Pages
 
             try
             {
+                // Start the authentication process using SRP (Secure Remote Password) protocol
                 var authResponse = await user.StartWithSrpAuthAsync(authRequest).ConfigureAwait(false);
 
                 if (authResponse.AuthenticationResult != null)
                 {
-                    // Handle successful login (e.g., set cookies, redirect)
+                    var accessToken = authResponse.AuthenticationResult.AccessToken;
+
+                    // Redirect to a JavaScript-enabled page and pass the access token in query params
+                    //return Redirect($"/Identity/LoginSuccess?accessToken={accessToken}");
                     return RedirectToPage("/Index");
                 }
                 else
@@ -67,9 +72,9 @@ namespace Eduhunt.Areas.Identity.Pages
                     return Page();
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                // Handle errors (e.g., incorrect login details)
+                // Handle errors (e.g., incorrect login details, network issues)
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }

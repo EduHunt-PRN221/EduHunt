@@ -1,3 +1,4 @@
+using Eduhunt;
 using Eduhunt.AppSettings;
 using Eduhunt.Data;
 using Eduhunt.Models.Entities;
@@ -39,6 +40,10 @@ builder.Services
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddRoles<IdentityRole>()
     .AddDefaultTokenProviders();
+
+
+// Call your extension method here to register custom services
+builder.Services.AddAllCustomServices();
 
 var app = builder.Build();
 

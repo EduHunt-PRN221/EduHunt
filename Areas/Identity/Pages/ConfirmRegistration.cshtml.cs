@@ -1,8 +1,11 @@
 using Amazon;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
+using Eduhunt.Applications.ApplicactionUsers;
+using Eduhunt.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Eduhunt.Areas.Identity.Pages
 {
@@ -10,6 +13,9 @@ namespace Eduhunt.Areas.Identity.Pages
     {
         private readonly AmazonCognitoIdentityProviderClient _provider;
         private readonly IConfiguration _configuration;
+
+        private readonly IServiceProvider _serviceProvider;
+
 
         [BindProperty]
         public string Username { get; set; } = default!;
@@ -20,10 +26,10 @@ namespace Eduhunt.Areas.Identity.Pages
         [BindProperty]
         public string ConfirmationCode { get; set; } = default!;
 
-        public ConfirmRegistrationModel(IConfiguration configuration)
+        public ConfirmRegistrationModel(IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _configuration = configuration;
-
+            _serviceProvider = serviceProvider;
             // Initialize AmazonCognitoIdentityProviderClient with configuration
             var accessKey = _configuration["AWS:AccessKey"];
             var secretKey = _configuration["AWS:SecretKey"];
@@ -64,8 +70,23 @@ namespace Eduhunt.Areas.Identity.Pages
 
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                 {
+
+                    var applicationUser = _serviceProvider.GetRequiredService<ApplicationUserService>();
+
+
+                    ApplicationUser newUser = new() { Email = Emailuser, UserName = Username, EmailConfirmed = true };
+                    //add role
+
+
+                    // create relationship many to many to role
+
+
+
+
+                    await applicationUser.AddAsync(newUser);
                     // Confirmation was successful; redirect to login or a welcome page
-                    return RedirectToPage("/Login");
+
+                    return LocalRedirect($"/Identity/Login");
                 }
                 else
                 {
