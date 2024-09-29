@@ -2,12 +2,11 @@
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Extensions.CognitoAuthentication;
-using CloudinaryDotNet.Actions;
 using Eduhunt.Applications.ApplicactionUsers;
-using Eduhunt.Models.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Eduhunt.Areas.Identity.Pages
 {
@@ -22,7 +21,7 @@ namespace Eduhunt.Areas.Identity.Pages
         private readonly AmazonCognitoIdentityProviderClient _provider;
         private readonly CognitoUserPool _userPool;
         private readonly IConfiguration _configuration;
-        private readonly IServiceProvider serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
 
         [BindProperty]
         public string Username { get; set; } = default!;
@@ -33,9 +32,14 @@ namespace Eduhunt.Areas.Identity.Pages
         [BindProperty]
         public string Email { get; set; } = default!;
 
-        public RegisterModel(IConfiguration configuration)
+        [BindProperty]
+        public string Role { get; set; } = default!;
+
+        public List<SelectListItem> RoleList { get; set; }
+        public RegisterModel(IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _configuration = configuration;
+            _serviceProvider = serviceProvider;
 
             // Retrieve configuration values from appsettings.json
             var accessKey = _configuration["AWS:AccessKey"];
@@ -54,8 +58,10 @@ namespace Eduhunt.Areas.Identity.Pages
             _userPool = new CognitoUserPool(userPoolId, clientId, _provider);
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
+            var service= _serviceProvider.GetRequiredService<ApplicationUserService>();
+            RoleList = await service.GetAllRolesAsync();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -131,7 +137,7 @@ namespace Eduhunt.Areas.Identity.Pages
                     // Registration was successful, redirect to a confirmation page or login page
 
 
-                    return LocalRedirect($"/Identity/ConfirmRegistration?username={Username}&mail={Email}");
+                    return LocalRedirect($"/Identity/ConfirmRegistration?username={Username}&mail={Email}&role={Role}");
 
 
                 }

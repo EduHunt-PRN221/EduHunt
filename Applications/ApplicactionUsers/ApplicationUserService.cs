@@ -2,8 +2,8 @@
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Eduhunt.Applications.ApplicactionUsers
 {
@@ -21,6 +21,18 @@ namespace Eduhunt.Applications.ApplicactionUsers
         {
             _userManager = userManager;
             _roleManager = roleManager;
+        }
+
+        public async Task<List<SelectListItem>> GetAllRolesAsync()
+        {
+            var roles = await _context.Roles
+                .Select(r => new SelectListItem
+                {
+                    Value = r.Name,
+                    Text = r.Name
+                })
+                .ToListAsync();
+            return roles;
         }
 
         // Method to add a role to a user

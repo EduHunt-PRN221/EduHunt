@@ -5,7 +5,6 @@ using Eduhunt.Applications.ApplicactionUsers;
 using Eduhunt.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Eduhunt.Areas.Identity.Pages
 {
@@ -19,6 +18,9 @@ namespace Eduhunt.Areas.Identity.Pages
 
         [BindProperty]
         public string Username { get; set; } = default!;
+
+        [BindProperty]
+        public string Role { get; set; } = default!;
 
         [BindProperty]
         public string Emailuser { get; set; } = default!;
@@ -41,11 +43,12 @@ namespace Eduhunt.Areas.Identity.Pages
                 RegionEndpoint.GetBySystemName(region));
         }
 
-        public void OnGet(string username, string mail)
+        public void OnGet(string username, string mail, string role)
         {
             // Pre-fill the username if it's passed in the query string
             Username = username;
             Emailuser = mail;
+            Role = role;
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -75,16 +78,10 @@ namespace Eduhunt.Areas.Identity.Pages
 
 
                     ApplicationUser newUser = new() { Email = Emailuser, UserName = Username, EmailConfirmed = true };
-                    //add role
-
-
-                    // create relationship many to many to role
-
-
-
-
                     await applicationUser.AddAsync(newUser);
-                    // Confirmation was successful; redirect to login or a welcome page
+                    //get Id from user create below
+                    var userId = newUser.Id;
+                    await applicationUser.AddRoleForUserAsync(userId, Role);
 
                     return LocalRedirect($"/Identity/Login");
                 }
