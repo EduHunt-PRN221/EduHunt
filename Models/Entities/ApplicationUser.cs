@@ -7,5 +7,7 @@ namespace Eduhunt.Models.Entities
     {
         public string? Name { get; set; }
         public bool IsNotDeleted { get; set; } = true;
+        public string? AvatarUrl { get; set; }
+        public bool IsVIP { get; set; } = false;
     }
 }

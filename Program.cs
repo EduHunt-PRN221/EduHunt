@@ -1,9 +1,11 @@
 using Eduhunt;
 using Eduhunt.AppSettings;
 using Eduhunt.Data;
+using Eduhunt.Infrastructures.Cloud;
 using Eduhunt.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,11 +44,27 @@ builder.Services
     .AddDefaultTokenProviders();
 
 
+builder.Services.Configure<CloudinarySetting>(builder.Configuration.GetSection("CloudinarySetting"));
+builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<CloudinarySetting>>().Value);
+builder.Services.AddTransient<CloudinaryService>();
 // Call your extension method here to register custom services
 builder.Services.AddAllCustomServices();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    string role = "Student";
+    if (!(await roleManager.RoleExistsAsync(role)))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Student"));
+        await roleManager.CreateAsync(new IdentityRole("Mentor"));
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
+    }
+}
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

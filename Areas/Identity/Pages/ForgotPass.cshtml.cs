@@ -2,6 +2,8 @@ using Amazon;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Extensions.CognitoAuthentication;
+using Eduhunt.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -12,28 +14,27 @@ namespace Eduhunt.Areas.Identity.Pages
         private readonly AmazonCognitoIdentityProviderClient _provider;
         private readonly CognitoUserPool _userPool;
         private readonly IConfiguration _configuration;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         [BindProperty]
         public string Email { get; set; } = default!;
 
-        public ForgotPassModel(IConfiguration configuration)
+        public ForgotPassModel(IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
             _configuration = configuration;
+            _userManager = userManager;
 
-            // Retrieve configuration values from appsettings.json
             var accessKey = _configuration["AWS:AccessKey"];
             var secretKey = _configuration["AWS:SecretKey"];
             var region = _configuration["AWS:Region"];
             var userPoolId = _configuration["AWS:UserPoolId"];
             var clientId = _configuration["AWS:ClientId"];
 
-            // Initialize AmazonCognitoIdentityProviderClient with configuration
             _provider = new AmazonCognitoIdentityProviderClient(
                 accessKey,
                 secretKey,
                 RegionEndpoint.GetBySystemName(region));
 
-            // Initialize CognitoUserPool with UserPoolId and ClientId
             _userPool = new CognitoUserPool(userPoolId, clientId, _provider);
         }
 
@@ -50,20 +51,23 @@ namespace Eduhunt.Areas.Identity.Pages
 
             try
             {
-                // Create Forgot Password request
+                if (_userManager.FindByEmailAsync(Email).Result == null)
+                {
+                    ModelState.AddModelError(string.Empty, "User not found.");
+                    return Page();
+                }
+
                 var forgotPasswordRequest = new ForgotPasswordRequest
                 {
                     ClientId = _configuration["AWS:ClientId"],
                     Username = Email
                 };
 
-                // Initiate the forgot password process
                 var response = await _provider.ForgotPasswordAsync(forgotPasswordRequest);
 
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    // Redirect to a page where the user can input the confirmation code and new password
-                    return RedirectToPage("/Identity/ConfirmRegistration", new { email = Email });
+                    return LocalRedirect($"/Identity/ConfirmRegistration?mail={Email}&isPasswordReset=true");
                 }
                 else
                 {
@@ -73,7 +77,6 @@ namespace Eduhunt.Areas.Identity.Pages
             }
             catch (Exception ex)
             {
-                // Handle exceptions such as user not found or service issues
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }

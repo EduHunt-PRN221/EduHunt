@@ -1,4 +1,5 @@
-﻿using Amazon;
+﻿
+using Amazon;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Extensions.CognitoAuthentication;
@@ -6,7 +7,6 @@ using Eduhunt.Applications.ApplicactionUsers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace Eduhunt.Areas.Identity.Pages
 {
@@ -35,7 +35,8 @@ namespace Eduhunt.Areas.Identity.Pages
         [BindProperty]
         public string Role { get; set; } = default!;
 
-        public List<SelectListItem> RoleList { get; set; }
+        public List<SelectListItem> RoleList { get; set; } = new List<SelectListItem>(); // Initialize RoleList with an empty list
+
         public RegisterModel(IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _configuration = configuration;
@@ -66,6 +67,7 @@ namespace Eduhunt.Areas.Identity.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
+            var UserService = _serviceProvider.GetRequiredService<ApplicationUserService>();
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -108,7 +110,7 @@ namespace Eduhunt.Areas.Identity.Pages
                 }
                 catch (UserNotFoundException)
                 {
-                        // User does not exist, proceed with registration
+                    // User does not exist, proceed with registration
                 }
 
 
@@ -135,10 +137,7 @@ namespace Eduhunt.Areas.Identity.Pages
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                 {
                     // Registration was successful, redirect to a confirmation page or login page
-
-
                     return LocalRedirect($"/Identity/ConfirmRegistration?username={Username}&mail={Email}&role={Role}");
-
 
                 }
                 else

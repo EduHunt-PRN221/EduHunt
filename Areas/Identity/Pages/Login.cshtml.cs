@@ -1,8 +1,11 @@
 using Amazon;
 using Amazon.CognitoIdentityProvider;
 using Amazon.Extensions.CognitoAuthentication;
+using Eduhunt.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Eduhunt.Areas.Identity.Pages
 {
@@ -11,6 +14,7 @@ namespace Eduhunt.Areas.Identity.Pages
         private readonly CognitoUserPool _userPool;
         private readonly AmazonCognitoIdentityProviderClient _provider;
         private readonly IConfiguration _configuration;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         [BindProperty]
         public string Username { get; set; } = default!;  // This should be email used as username
@@ -18,9 +22,10 @@ namespace Eduhunt.Areas.Identity.Pages
         [BindProperty]
         public string Password { get; set; } = default!;
 
-        public LoginModel(IConfiguration configuration)
+        public LoginModel(IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
             _configuration = configuration;
+            _userManager = userManager;
 
             // Retrieve configuration values from appsettings.json
             var accessKey = _configuration["AWS:AccessKey"];
@@ -42,7 +47,7 @@ namespace Eduhunt.Areas.Identity.Pages
         public void OnGet()
         {
         }
-
+        
         public async Task<IActionResult> OnPostAsync()
         {
             // Here, we assume Username is the email, which Cognito can treat as the username
@@ -60,11 +65,36 @@ namespace Eduhunt.Areas.Identity.Pages
 
                 if (authResponse.AuthenticationResult != null)
                 {
-                    var accessToken = authResponse.AuthenticationResult.AccessToken;
 
-                    // Redirect to a JavaScript-enabled page and pass the access token in query params
-                    //return Redirect($"/Identity/LoginSuccess?accessToken={accessToken}");
-                    return RedirectToPage("/Index");
+                    var accessToken = authResponse.AuthenticationResult.AccessToken;
+                    var idToken = authResponse.AuthenticationResult.IdToken;
+                    var userEmail = GetUserEmailFromAccessToken(idToken);
+                    // set the userId in a cookie
+                    HttpContext.Response.Cookies.Append("userEmail", userEmail, new CookieOptions
+                    {
+                        HttpOnly = true, 
+                        Secure = true,  
+                        SameSite = SameSiteMode.Strict, 
+                        Expires = DateTimeOffset.UtcNow.AddDays(30) 
+                    });
+
+
+                    // Retrieve the ApplicationUser using UserManager
+                    var applicationUser = await _userManager.FindByEmailAsync(Username);
+
+                    if (applicationUser != null)
+                    {
+                        var userId = applicationUser.Id;
+
+                        // You can now use the userId as needed
+                        // For example, you could add it to the query string:
+                        return LocalRedirect($"/Index?userId={userId}");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "User not found in local database.");
+                        return Page();
+                    }
                 }
                 else
                 {
@@ -78,6 +108,21 @@ namespace Eduhunt.Areas.Identity.Pages
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
+        }
+
+        private string GetUserEmailFromAccessToken(string accessToken)
+        {
+            var handler = new JwtSecurityTokenHandler();
+
+            var jsonToken = handler.ReadToken(accessToken) as JwtSecurityToken;
+
+            if (jsonToken == null)
+            {
+                return string.Empty;
+            }
+
+            var email = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value;
+            return email ?? string.Empty;
         }
     }
 }

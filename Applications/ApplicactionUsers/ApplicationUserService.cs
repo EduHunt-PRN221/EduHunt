@@ -61,5 +61,40 @@ namespace Eduhunt.Applications.ApplicactionUsers
             var result = await _userManager.AddToRoleAsync(user, roleName);
             return result.Succeeded;
         }
+
+        // Method to get newest userId by email
+        public async Task<string> GetNewestIdByEmailAsync(string email)
+        {
+            var userId = await _context.Users
+            .Where(u => u.Email == email)
+            .Select(u => u.Id)
+            .FirstOrDefaultAsync();
+
+            return userId!;
+        }
+
+        public async Task<bool> GetVIPStatusByEmailAsync(string email)
+        {
+            bool? status = await _context.Users
+                                 .Where(u => u.Email == email)
+                                 .Select(u => u.IsVIP)
+                                 .FirstOrDefaultAsync();
+
+            return status ?? false;
+        }
+
+        // update user's VIP status
+        public async Task UpdateVIPStatusByEmailAsync(string email, bool status)
+        {
+            var user = await _context.Users
+                .Where(u => u.Email == email)
+                .FirstOrDefaultAsync();
+
+            if (user != null)
+            {
+                user.IsVIP = status;
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

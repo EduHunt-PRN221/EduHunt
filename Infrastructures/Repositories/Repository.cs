@@ -53,8 +53,15 @@ namespace Eduhunt.Infrastructures.Repositories
         {
             if (entity != null)
             {
-                _context.Set<T>().Update(entity);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    _context.Set<T>().Update(entity);
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
             else
             {

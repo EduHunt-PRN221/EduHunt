@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Eduhunt.Applications.ApplicactionUsers;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Eduhunt.Pages
 {

@@ -25,13 +25,13 @@
                 <!-- Submit Button -->
                 <button type="submit" class="btn btn-primary w-100">Send Reset Link</button>
 
+                @if (ViewData.ModelState.ErrorCount > 0)
+                {
+                    <div class="alert alert-danger mt-3 text-center" role="alert">
+                        @ViewData.ModelState[string.Empty].Errors[0].ErrorMessage
+                    </div>
+                }
             </form>
-            @if (ViewData.ModelState.ErrorCount > 0)
-            {
-                <div class="alert alert-danger mt-3 text-center" role="alert">
-                    @ViewData.ModelState[string.Empty].Errors[0].ErrorMessage
-                </div>
-            }
         </div>
     </div>
 </div>
