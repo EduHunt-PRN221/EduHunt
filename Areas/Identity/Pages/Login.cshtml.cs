@@ -5,6 +5,7 @@ using Eduhunt.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Eduhunt.Areas.Identity.Pages
 {
@@ -46,7 +47,7 @@ namespace Eduhunt.Areas.Identity.Pages
         public void OnGet()
         {
         }
-
+        
         public async Task<IActionResult> OnPostAsync()
         {
             // Here, we assume Username is the email, which Cognito can treat as the username
@@ -64,6 +65,19 @@ namespace Eduhunt.Areas.Identity.Pages
 
                 if (authResponse.AuthenticationResult != null)
                 {
+
+                    var accessToken = authResponse.AuthenticationResult.AccessToken;
+                    var idToken = authResponse.AuthenticationResult.IdToken;
+                    var userEmail = GetUserEmailFromAccessToken(idToken);
+                    // set the userId in a cookie
+                    HttpContext.Response.Cookies.Append("userEmail", userEmail, new CookieOptions
+                    {
+                        HttpOnly = true, 
+                        Secure = true,  
+                        SameSite = SameSiteMode.Strict, 
+                        Expires = DateTimeOffset.UtcNow.AddDays(30) 
+                    });
+
 
                     // Retrieve the ApplicationUser using UserManager
                     var applicationUser = await _userManager.FindByEmailAsync(Username);
@@ -94,6 +108,21 @@ namespace Eduhunt.Areas.Identity.Pages
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
+        }
+
+        private string GetUserEmailFromAccessToken(string accessToken)
+        {
+            var handler = new JwtSecurityTokenHandler();
+
+            var jsonToken = handler.ReadToken(accessToken) as JwtSecurityToken;
+
+            if (jsonToken == null)
+            {
+                return string.Empty;
+            }
+
+            var email = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value;
+            return email ?? string.Empty;
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Eduhunt.Applications.ApplicactionUsers;
 using Eduhunt.Applications.Cvs;
+using Eduhunt.Applications.Payment;
+using Eduhunt.Applications.ProfileService;
 using Eduhunt.Infrastructures.Cloud;
 
 namespace Eduhunt
@@ -10,7 +12,8 @@ namespace Eduhunt
         {
             services.AddScoped<CvService>();
             services.AddScoped<ApplicationUserService>();
-           // services.AddScoped<CloudinaryService>();
+            services.AddScoped<ProfileService>();
+            services.AddScoped<PaymentService>();
 
             return services;
         }

@@ -2,6 +2,7 @@ using Amazon;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using Eduhunt.Applications.ApplicactionUsers;
+using Eduhunt.Applications.ProfileService;
 using Eduhunt.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -158,11 +159,12 @@ namespace Eduhunt.Areas.Identity.Pages
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var applicationUser = _serviceProvider.GetRequiredService<ApplicationUserService>();
-
+                    var profileService = _serviceProvider.GetRequiredService<ProfileService>();
                     ApplicationUser newUser = new() { Email = Emailuser, UserName = Username, EmailConfirmed = true };
                     await applicationUser.AddAsync(newUser);
                     var userId = newUser.Id;
                     await applicationUser.AddRoleForUserAsync(userId, Role);
+                    await profileService.AddAsync(new Models.Entities.Profile() { UserName = Username, Email = Emailuser, ApplicationUserId = userId, AvatarImage = "https://shorturl.at/cHJyG" });
 
                     return LocalRedirect($"/Identity/Login");
                 }

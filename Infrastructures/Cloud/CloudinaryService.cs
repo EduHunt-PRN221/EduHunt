@@ -10,9 +10,29 @@ namespace Eduhunt.Infrastructures.Cloud
 
         public CloudinaryService(CloudinarySetting cloudinary)
         {
-            var account = new Account { ApiKey = cloudinary.ApiKey, ApiSecret = cloudinary.ApiKey, Cloud = cloudinary.CloudName };
+            var account = new Account { ApiKey = cloudinary.ApiKey, ApiSecret = cloudinary.ApiSecret, Cloud = cloudinary.CloudName };
 
             _cloudinary = new Cloudinary(account);
+        }
+
+        public async Task<string?> UploadSingleAsync(IFormFile file)
+        {
+            if (file ==null) return null;
+
+            var uploadFileResult = await _cloudinary.UploadAsync(
+                new CloudinaryDotNet.Actions.ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, file.OpenReadStream()),
+                    DisplayName = file.FileName,
+                }
+                );
+
+            if (uploadFileResult != null && uploadFileResult.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return uploadFileResult.SecureUrl.ToString();
+            }
+
+            return null;
         }
 
         public async Task<string> UploadSingleAsync(Stream fileStream, string fileName)
