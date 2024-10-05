@@ -107,40 +107,6 @@ namespace Eduhunt.Areas.Identity.Pages
 
             try
             {
-                if (IsPasswordReset)
-                {
-                    return await HandlePasswordReset();
-                }
-                else
-                {
-                    return await HandleRegistrationConfirmation();
-                }
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return Page();
-            }
-        }
-
-        private async Task<IActionResult> HandlePasswordReset()
-        {
-            if (string.IsNullOrEmpty(NewPassword))
-            {
-                ModelState.AddModelError(nameof(NewPassword), "New password is required.");
-                return Page();
-            }
-
-            var confirmForgotPasswordRequest = new ConfirmForgotPasswordRequest
-            {
-                ClientId = _configuration["AWS:ClientId"],
-                Username = Emailuser,
-                ConfirmationCode = ConfirmationCode,
-                Password = NewPassword
-            };
-
-            try
-            {
                 var response = await _provider.ConfirmForgotPasswordAsync(confirmForgotPasswordRequest);
 
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
@@ -194,7 +160,6 @@ namespace Eduhunt.Areas.Identity.Pages
                 {
                     var applicationUser = _serviceProvider.GetRequiredService<ApplicationUserService>();
                     var profileService = _serviceProvider.GetRequiredService<ProfileService>();
-
                     ApplicationUser newUser = new() { Email = Emailuser, UserName = Username, EmailConfirmed = true };
                     await applicationUser.AddAsync(newUser);
                     var userId = newUser.Id;
