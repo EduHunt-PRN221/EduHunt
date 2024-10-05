@@ -5,6 +5,7 @@ using Eduhunt.Applications.ApplicactionUsers;
 using Eduhunt.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.ComponentModel.DataAnnotations;
 
 namespace Eduhunt.Areas.Identity.Pages
 {
@@ -12,27 +13,38 @@ namespace Eduhunt.Areas.Identity.Pages
     {
         private readonly AmazonCognitoIdentityProviderClient _provider;
         private readonly IConfiguration _configuration;
-
         private readonly IServiceProvider _serviceProvider;
 
+        [BindProperty]
+        public string? Username { get; set; }
 
         [BindProperty]
-        public string Username { get; set; } = default!;
+        public string? Role { get; set; }
 
         [BindProperty]
-        public string Role { get; set; } = default!;
-
-        [BindProperty]
+        [Required]
         public string Emailuser { get; set; } = default!;
 
         [BindProperty]
+        [Required]
         public string ConfirmationCode { get; set; } = default!;
+
+        [BindProperty]
+        [DataType(DataType.Password)]
+        public string? NewPassword { get; set; }
+
+        [BindProperty]
+        [DataType(DataType.Password)]
+        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        public string? ConfirmNewPassword { get; set; }
+
+        [BindProperty]
+        public bool IsPasswordReset { get; set; }
 
         public ConfirmRegistrationModel(IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _configuration = configuration;
             _serviceProvider = serviceProvider;
-            // Initialize AmazonCognitoIdentityProviderClient with configuration
             var accessKey = _configuration["AWS:AccessKey"];
             var secretKey = _configuration["AWS:SecretKey"];
             var region = _configuration["AWS:Region"];
@@ -43,12 +55,12 @@ namespace Eduhunt.Areas.Identity.Pages
                 RegionEndpoint.GetBySystemName(region));
         }
 
-        public void OnGet(string username, string mail, string role)
+        public void OnGet(string? username, string mail, string? role, bool isPasswordReset = false)
         {
-            // Pre-fill the username if it's passed in the query string
             Username = username;
             Emailuser = mail;
             Role = role;
+            IsPasswordReset = isPasswordReset;
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -60,26 +72,95 @@ namespace Eduhunt.Areas.Identity.Pages
 
             try
             {
-                // Create the request to confirm the user sign-up
-                var confirmSignUpRequest = new ConfirmSignUpRequest
+                if (IsPasswordReset)
                 {
-                    ClientId = _configuration["AWS:ClientId"],
-                    Username = Emailuser,
-                    ConfirmationCode = ConfirmationCode
-                };
+                    return await HandlePasswordReset();
+                }
+                else
+                {
+                    return await HandleRegistrationConfirmation();
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return Page();
+            }
+        }
 
-                // Confirm the registration with AWS Cognito
+        private async Task<IActionResult> HandlePasswordReset()
+        {
+            if (string.IsNullOrEmpty(NewPassword))
+            {
+                ModelState.AddModelError(nameof(NewPassword), "New password is required.");
+                return Page();
+            }
+
+            var confirmForgotPasswordRequest = new ConfirmForgotPasswordRequest
+            {
+                ClientId = _configuration["AWS:ClientId"],
+                Username = Emailuser,
+                ConfirmationCode = ConfirmationCode,
+                Password = NewPassword
+            };
+
+            try
+            {
+                var response = await _provider.ConfirmForgotPasswordAsync(confirmForgotPasswordRequest);
+
+                if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    return LocalRedirect($"/Identity/Login");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Password reset failed.");
+                    return Page();
+                }
+            }
+            catch (InvalidPasswordException)
+            {
+                ModelState.AddModelError(nameof(NewPassword), "The password does not conform to policy.");
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return Page();
+            }
+        }
+
+        private async Task<IActionResult> HandleRegistrationConfirmation()
+        {
+            if (string.IsNullOrEmpty(Username))
+            {
+                ModelState.AddModelError(nameof(Username), "Username is required for registration confirmation.");
+                return Page();
+            }
+
+            if (string.IsNullOrEmpty(Role))
+            {
+                ModelState.AddModelError(nameof(Role), "Role is required for registration confirmation.");
+                return Page();
+            }
+
+            var confirmSignUpRequest = new ConfirmSignUpRequest
+            {
+                ClientId = _configuration["AWS:ClientId"],
+                Username = Emailuser,
+                ConfirmationCode = ConfirmationCode
+            };
+
+            try
+            {
                 var response = await _provider.ConfirmSignUpAsync(confirmSignUpRequest);
 
                 if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                 {
-
                     var applicationUser = _serviceProvider.GetRequiredService<ApplicationUserService>();
-
 
                     ApplicationUser newUser = new() { Email = Emailuser, UserName = Username, EmailConfirmed = true };
                     await applicationUser.AddAsync(newUser);
-                    //get Id from user create below
                     var userId = newUser.Id;
                     await applicationUser.AddRoleForUserAsync(userId, Role);
 
@@ -91,9 +172,13 @@ namespace Eduhunt.Areas.Identity.Pages
                     return Page();
                 }
             }
+            catch (CodeMismatchException)
+            {
+                ModelState.AddModelError(nameof(ConfirmationCode), "Invalid confirmation code.");
+                return Page();
+            }
             catch (Exception ex)
             {
-                // Handle errors such as invalid confirmation code or network issues
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }

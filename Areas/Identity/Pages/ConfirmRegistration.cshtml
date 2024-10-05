@@ -1,50 +1,82 @@
 ﻿@page
 @model Eduhunt.Areas.Identity.Pages.ConfirmRegistrationModel
 @{
-    ViewData["Title"] = "Confirm Registration";
+    ViewData["Title"] = Model.IsPasswordReset ? "Reset Password" : "Confirm Registration";
 }
 
 <div class="d-flex justify-content-center align-items-center vh-100" style="background-color: #BEE9F2;">
-    <div class="d-flex h-100 w-75">
+    <div class="d-flex w-75 h-75">
         <!-- Left Image Section -->
         <div class="w-50 me-4 rounded-3"
              style="background-image: url('/images/schoolGirl.png'); background-size: cover; background-repeat: no-repeat;">
         </div>
 
         <!-- Right Form Section -->
-        <div class="w-50 d-flex align-items-center rounded-3 bg-white">
-            <div class="container p-4">
-                <div class="mx-auto" style="width: 80%;">
-                    <h1 class="h4 font-weight-bold mb-4 text-center">Confirm Registration</h1>
-                    <form method="post">
-                        <!-- Email Field -->
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input asp-for="Emailuser" class="form-control" readonly />
-                            <span asp-validation-for="Emailuser" class="text-danger"></span>
-                        </div>
+        <div class="card w-50 shadow-sm p-4 d-flex align-items-center">
+            <h2 class="text-center mb-4">@(Model.IsPasswordReset ? "Reset Password" : "Confirm Registration")</h2>
+            <form method="post" class="w-100">
+                <input type="hidden" asp-for="IsPasswordReset" />
 
-                        <!-- Confirmation Code Field -->
-                        <div class="mb-3">
-                            <label class="form-label">Code</label>
-                            <input asp-for="ConfirmationCode" class="form-control" />
-                            <span asp-validation-for="ConfirmationCode" class="text-danger"></span>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary w-100">
-                            Confirm
-                        </button>
-
-                    </form>
-                    @* @if (ViewData.ModelState.ErrorCount > 0)
-                    {
-                        <div class="alert alert-danger mt-3 text-center" role="alert">
-                            @ViewData.ModelState[string.Empty].Errors[0].ErrorMessage
-                        </div>
-                    } *@
+                <!-- Email Input Field -->
+                <div class="mb-3">
+                    <label asp-for="Emailuser" class="form-label">Email</label>
+                    <input asp-for="Emailuser" class="form-control" type="email" readonly />
+                    <span asp-validation-for="Emailuser" class="text-danger"></span>
                 </div>
-            </div>
+
+                <!-- Confirmation Code Field -->
+                <div class="mb-3">
+                    <label asp-for="ConfirmationCode" class="form-label">Confirmation Code</label>
+                    <input asp-for="ConfirmationCode" class="form-control" />
+                    <span asp-validation-for="ConfirmationCode" class="text-danger"></span>
+                </div>
+
+                @if (Model.IsPasswordReset)
+                {
+                    <!-- New Password Field -->
+                    <div class="mb-3">
+                        <label asp-for="NewPassword" class="form-label">New Password</label>
+                        <input asp-for="NewPassword" class="form-control" type="password" />
+                        <span asp-validation-for="NewPassword" class="text-danger"></span>
+                    </div>
+
+                    <!-- Confirm New Password Field -->
+                    <div class="mb-3">
+                        <label asp-for="ConfirmNewPassword" class="form-label">Confirm New Password</label>
+                        <input asp-for="ConfirmNewPassword" class="form-control" type="password" />
+                        <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <!-- Username Field (only for registration confirmation) -->
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label">Username</label>
+                        <input asp-for="Username" class="form-control" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+
+                    <input type="hidden" asp-for="Role" />
+                }
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100">
+                    @(Model.IsPasswordReset ? "Reset Password" : "Confirm Registration")
+                </button>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger mt-3 text-center" role="alert">
+                        @foreach (var modelState in ViewData.ModelState.Values)
+                        {
+                            foreach (var error in modelState.Errors)
+                            {
+                                <div>@error.ErrorMessage</div>
+                            }
+                        }
+                    </div>
+                }
+            </form>
         </div>
     </div>
 </div>

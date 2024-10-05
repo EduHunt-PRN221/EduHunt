@@ -1,6 +1,8 @@
 using Amazon;
 using Amazon.CognitoIdentityProvider;
 using Amazon.Extensions.CognitoAuthentication;
+using Eduhunt.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -11,6 +13,7 @@ namespace Eduhunt.Areas.Identity.Pages
         private readonly CognitoUserPool _userPool;
         private readonly AmazonCognitoIdentityProviderClient _provider;
         private readonly IConfiguration _configuration;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         [BindProperty]
         public string Username { get; set; } = default!;  // This should be email used as username
@@ -18,9 +21,10 @@ namespace Eduhunt.Areas.Identity.Pages
         [BindProperty]
         public string Password { get; set; } = default!;
 
-        public LoginModel(IConfiguration configuration)
+        public LoginModel(IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
             _configuration = configuration;
+            _userManager = userManager;
 
             // Retrieve configuration values from appsettings.json
             var accessKey = _configuration["AWS:AccessKey"];
@@ -60,11 +64,23 @@ namespace Eduhunt.Areas.Identity.Pages
 
                 if (authResponse.AuthenticationResult != null)
                 {
-                    var accessToken = authResponse.AuthenticationResult.AccessToken;
 
-                    // Redirect to a JavaScript-enabled page and pass the access token in query params
-                    //return Redirect($"/Identity/LoginSuccess?accessToken={accessToken}");
-                    return RedirectToPage("/Index");
+                    // Retrieve the ApplicationUser using UserManager
+                    var applicationUser = await _userManager.FindByEmailAsync(Username);
+
+                    if (applicationUser != null)
+                    {
+                        var userId = applicationUser.Id;
+
+                        // You can now use the userId as needed
+                        // For example, you could add it to the query string:
+                        return LocalRedirect($"/Index?userId={userId}");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "User not found in local database.");
+                        return Page();
+                    }
                 }
                 else
                 {
