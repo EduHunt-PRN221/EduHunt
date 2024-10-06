@@ -17,7 +17,7 @@ namespace Eduhunt.Models.Entities
         public string? AvatarImage { get; set; }
 
         public string? ApplicationUserId { get; set; }
-        public virtual ApplicationUser ApplicationUser { get; set; } = default!;
+        public virtual ApplicationUser? ApplicationUser { get; set; } = default!;
 
     }
 }
