@@ -26,7 +26,7 @@ namespace Eduhunt.Pages
         [BindProperty]
         public Profile? profile { get; set; }
         [BindProperty]
-        public IFormFile Upload { get; set; }
+        public IFormFile? Upload { get; set; }
         [BindProperty]
         public bool? IsVIP { get; set; } = false;
         private readonly IServiceProvider _serviceProvider;
@@ -67,35 +67,50 @@ namespace Eduhunt.Pages
 
         public async Task<IActionResult> OnPost()
         {
+            var userEmail = GetUserEmailFromCookie();
+            var profileDb = await _profileService.GetProfileByUserEmailAsync(userEmail);
+
             var _cloudinaryService = _serviceProvider.GetRequiredService<CloudinaryService>();
-            var url = await _cloudinaryService.UploadSingleAsync(Upload);
+
+            string? url = null;
+
+            if (Upload != null)
+            {
+                url = await _cloudinaryService.UploadSingleAsync(Upload);
+            }
 
             if (url != null)
             {
                 profile!.AvatarImage = url;
+            }
+            else
+            {
+                profile!.AvatarImage = profileDb.AvatarImage;
 
             }
             //validation
-            if (profile.FirstName.Any(char.IsDigit))
+            if (profile.FirstName != null && profile.FirstName.Any(char.IsDigit))
             {
-                ModelState.AddModelError(profile.FirstName, "First name cannot contain numbers");
+                ModelState.AddModelError("profile.FirstName", "First name cannot contain numbers");
             }
-            if (profile.LastName.Any(char.IsDigit))
+            if (profile.LastName != null && profile.LastName.Any(char.IsDigit))
             {
-                ModelState.AddModelError(profile.LastName, "Last name cannot contain numbers");
+                ModelState.AddModelError("profile.LastName", "Last name cannot contain numbers");
             }
             if (profile.UserName.Any(char.IsWhiteSpace))
             {
-                ModelState.AddModelError(profile.UserName, "Username cannot contain spaces");
+                ModelState.AddModelError("profile.UserName", "Username cannot contain spaces");
             }
-            if (profile.PhoneNumber.Any(char.IsLetter))
+            // Update the PhoneNumber validation to allow null values
+            if (profile.PhoneNumber != null && profile.PhoneNumber.Any(char.IsLetter))
             {
-                ModelState.AddModelError(profile.PhoneNumber, "Phone number cannot contain letters");
+                ModelState.AddModelError("profile.PhoneNumber", "Phone number cannot contain letters");
             }
+           
             // check email format 
             if (!new EmailAddressAttribute().IsValid(profile.Email))
             {
-                ModelState.AddModelError(profile.Email, "Invalid email format");
+                ModelState.AddModelError("profile.Email", "Invalid email format");
             }
 
             if (!ModelState.IsValid)
@@ -104,8 +119,6 @@ namespace Eduhunt.Pages
             }
 
 
-            var userEmail = GetUserEmailFromCookie();
-            var profileDb = await _profileService.GetProfileByUserEmailAsync(userEmail);
             //update profile
             profileDb!.FirstName = profile!.FirstName;
             profileDb!.LastName = profile!.LastName;
@@ -114,11 +127,17 @@ namespace Eduhunt.Pages
             profileDb!.PhoneNumber = profile!.PhoneNumber;
             profileDb!.Country = profile!.Country;
             profileDb!.City = profile!.City;
+
             profileDb!.Title = profile!.Title;
-            profileDb!.AvatarImage = profile!.AvatarImage;
+
+            if (profile!.AvatarImage != null)
+            {
+                profileDb!.AvatarImage = profile!.AvatarImage;
+
+            }
 
             await _profileService.UpdateAsync(profileDb);
-            return Page();
+            return RedirectToPage("/Profile");
         }
 
         public string GetUserEmailFromCookie()
