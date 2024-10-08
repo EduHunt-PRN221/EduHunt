@@ -28,7 +28,7 @@
             </div>
             <!-- Main Content -->
             <div class="col-md-9 p-4">
-              
+
                 <form method="post" enctype="multipart/form-data">
                     <div class="d-flex flex-column align-items-start mb-4">
                         <div class="border p-2">
@@ -38,7 +38,7 @@
                                      src="@(Model.profile?.AvatarImage ?? "https://shorturl.at/cHJyG")" width="250" style="object-fit: cover;" />
 
                                 <label class="position-absolute w-100 bg-dark text-white text-center py-1 " style="opacity: 0.7; cursor: pointer; bottom: 0;">
-                                    <input asp-for="Upload" type="file" class="form-control d-none" onchange="displaySelectedImage(event, 'selectedImage')" />
+                                    <input asp-for="Upload" type="file" class="form-control d-none" onchange="displaySelectedImage(this, 'selectedImage')" />
                                     Upload Photo
 
                                 </label>
@@ -62,7 +62,7 @@
                             Pay To Be VIP
                         </button>
                     }
-                    
+
                     <div class="form-row mb-4">
                         <div class="col">
                             <label class="text-dark">
@@ -85,7 +85,7 @@
                         <label class="text-dark">
                             Username
                         </label>
-                        <input class="form-control" placeholder="Enter your username" type="text" asp-for="profile.UserName" required/>
+                        <input class="form-control" placeholder="Enter your username" type="text" asp-for="profile.UserName" required />
                         <span asp-validation-for="profile.UserName" class="text-danger"></span>
 
                     </div>
@@ -93,7 +93,7 @@
                         <label class="text-dark">
                             Email
                         </label>
-                        <input class="form-control" placeholder="Email address" type="email" asp-for="profile.Email" required/>
+                        <input class="form-control" placeholder="Email address" type="email" asp-for="profile.Email" required />
                         <span asp-validation-for="profile.Email" class="text-danger"></span>
 
                     </div>
@@ -143,24 +143,23 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    function displaySelectedImage(event, elementId) {
+    function displaySelectedImage(inputElement, elementId) {
         const selectedImage = document.getElementById(elementId);
-        const fileInput = event.target;
 
-        if (fileInput.files && fileInput.files[0]) {
+        if (inputElement.files && inputElement.files[0]) {
             const reader = new FileReader();
 
             reader.onload = function (e) {
                 selectedImage.src = e.target.result;
             };
 
-            reader.readAsDataURL(fileInput.files[0]);
+            reader.readAsDataURL(inputElement.files[0]);
         }
     }
 
     $(document).ready(function () {
         $('#submitPayButton').click(function (event) {
-            event.preventDefault(); 
+            event.preventDefault();
             console.log('submitPayButton');
             $('#formPay button[type="submit"]').click();
         });

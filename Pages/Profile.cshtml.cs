@@ -1,22 +1,11 @@
-#pragma warning disable CS8604 // Possible null reference argument.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-#pragma warning disable CS8603 // Possible null reference return.
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-using Amazon.Extensions.CognitoAuthentication;
-using CloudinaryDotNet;
 using Eduhunt.Applications.ApplicactionUsers;
 using Eduhunt.Applications.Payment;
 using Eduhunt.Applications.ProfileService;
-using Eduhunt.Data;
 using Eduhunt.Infrastructures.Cloud;
-using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using System.Web;
 
 namespace Eduhunt.Pages
@@ -48,7 +37,12 @@ namespace Eduhunt.Pages
 
             // Get the user ID from the cookie
 
-            var userEmail = GetUserEmailFromCookie();
+            var idToken = _userService.GetIdTokenFromCookie(HttpContext);
+            if (idToken == null)
+            {
+                return RedirectToPage("/Index");
+            }
+            var userEmail = _userService.GetUserEmailFromIdToken(idToken);
             if (userEmail == null)
             {
                 userEmail = email;
@@ -67,8 +61,17 @@ namespace Eduhunt.Pages
 
         public async Task<IActionResult> OnPost()
         {
-            var userEmail = GetUserEmailFromCookie();
+            var idToken = _userService.GetIdTokenFromCookie(HttpContext);
+            if (idToken == null)
+            {
+                return RedirectToPage("/Index");
+            }
+            var userEmail = _userService.GetUserEmailFromIdToken(idToken);
             var profileDb = await _profileService.GetProfileByUserEmailAsync(userEmail);
+            if (profileDb == null)
+            {
+                return RedirectToPage("/Index");
+            }
 
             var _cloudinaryService = _serviceProvider.GetRequiredService<CloudinaryService>();
 
@@ -97,7 +100,7 @@ namespace Eduhunt.Pages
             {
                 ModelState.AddModelError("profile.LastName", "Last name cannot contain numbers");
             }
-            if (profile.UserName.Any(char.IsWhiteSpace))
+            if (profile.UserName != null && profile.UserName.Any(char.IsWhiteSpace))
             {
                 ModelState.AddModelError("profile.UserName", "Username cannot contain spaces");
             }
@@ -106,7 +109,7 @@ namespace Eduhunt.Pages
             {
                 ModelState.AddModelError("profile.PhoneNumber", "Phone number cannot contain letters");
             }
-           
+
             // check email format 
             if (!new EmailAddressAttribute().IsValid(profile.Email))
             {
@@ -122,12 +125,11 @@ namespace Eduhunt.Pages
             //update profile
             profileDb!.FirstName = profile!.FirstName;
             profileDb!.LastName = profile!.LastName;
-            profileDb!.UserName = profile!.UserName.Trim();
-            profileDb!.Email = profile!.Email.Trim();
+            profileDb!.UserName = profile!.UserName;
+            profileDb!.Email = profile!.Email;
             profileDb!.PhoneNumber = profile!.PhoneNumber;
             profileDb!.Country = profile!.Country;
             profileDb!.City = profile!.City;
-
             profileDb!.Title = profile!.Title;
 
             if (profile!.AvatarImage != null)
@@ -135,24 +137,28 @@ namespace Eduhunt.Pages
                 profileDb!.AvatarImage = profile!.AvatarImage;
 
             }
+            //trim the string
+            profileDb!.FirstName = profileDb!.FirstName != null ? profileDb!.FirstName.Trim() : null;
+            profileDb!.LastName = profileDb!.LastName != null ? profileDb!.LastName.Trim() : null;
+            profileDb!.UserName = profileDb!.UserName != null ? profileDb!.UserName.Trim() : null;
+            profileDb!.Email = profileDb!.Email != null ? profileDb!.Email.Trim() : null;
+            profileDb!.PhoneNumber = profileDb!.PhoneNumber != null ? profileDb!.PhoneNumber.Trim() : null;
+            profileDb!.Country = profileDb!.Country != null ? profileDb!.Country.Trim() : null;
+            profileDb!.City = profileDb!.City != null ? profileDb!.City.Trim() : null;
 
             await _profileService.UpdateAsync(profileDb);
             return RedirectToPage("/Profile");
         }
 
-        public string GetUserEmailFromCookie()
-        {
-            if (HttpContext.Request.Cookies.TryGetValue("userEmail", out var userEmail))
-            {
-                return userEmail;
-            }
-
-            return null;
-        }
 
         public async Task<IActionResult> OnPostPayVIP()
         {
-            var userEmail = GetUserEmailFromCookie();
+            var idToken = _userService.GetIdTokenFromCookie(HttpContext);
+            if (idToken == null)
+            {
+                return RedirectToPage("/Index");
+            }
+            var userEmail = _userService.GetUserEmailFromIdToken(idToken);
             var encodedEmail = HttpUtility.UrlEncode(userEmail);
             var cancelURL = $"https://localhost:7099/Profile?email={encodedEmail}";
             var successURL = $"https://localhost:7099/Profile?email={encodedEmail}";

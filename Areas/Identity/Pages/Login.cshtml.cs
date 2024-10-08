@@ -47,7 +47,7 @@ namespace Eduhunt.Areas.Identity.Pages
         public void OnGet()
         {
         }
-        
+
         public async Task<IActionResult> OnPostAsync()
         {
             // Here, we assume Username is the email, which Cognito can treat as the username
@@ -68,14 +68,13 @@ namespace Eduhunt.Areas.Identity.Pages
 
                     var accessToken = authResponse.AuthenticationResult.AccessToken;
                     var idToken = authResponse.AuthenticationResult.IdToken;
-                    var userEmail = GetUserEmailFromAccessToken(idToken);
                     // set the userId in a cookie
-                    HttpContext.Response.Cookies.Append("userEmail", userEmail, new CookieOptions
+                    HttpContext.Response.Cookies.Append("idToken", idToken, new CookieOptions
                     {
-                        HttpOnly = true, 
-                        Secure = true,  
-                        SameSite = SameSiteMode.Strict, 
-                        Expires = DateTimeOffset.UtcNow.AddDays(30) 
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTimeOffset.UtcNow.AddDays(30)
                     });
 
 
@@ -110,19 +109,6 @@ namespace Eduhunt.Areas.Identity.Pages
             }
         }
 
-        private string GetUserEmailFromAccessToken(string accessToken)
-        {
-            var handler = new JwtSecurityTokenHandler();
 
-            var jsonToken = handler.ReadToken(accessToken) as JwtSecurityToken;
-
-            if (jsonToken == null)
-            {
-                return string.Empty;
-            }
-
-            var email = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value;
-            return email ?? string.Empty;
-        }
     }
 }

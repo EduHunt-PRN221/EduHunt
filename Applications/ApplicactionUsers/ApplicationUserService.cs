@@ -4,6 +4,7 @@ using Eduhunt.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Eduhunt.Applications.ApplicactionUsers
 {
@@ -95,6 +96,31 @@ namespace Eduhunt.Applications.ApplicactionUsers
                 user.IsVIP = status;
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public string GetUserEmailFromIdToken(string Idtoken)
+        {
+            var handler = new JwtSecurityTokenHandler();
+
+            var jsonToken = handler.ReadToken(Idtoken) as JwtSecurityToken;
+
+            if (jsonToken == null)
+            {
+                return string.Empty;
+            }
+
+            var email = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value;
+            return email ?? string.Empty;
+        }
+
+        public string? GetIdTokenFromCookie(HttpContext httpContext)
+        {
+            if (httpContext.Request.Cookies.TryGetValue("idToken", out var idToken))
+            {
+                return idToken;
+            }
+
+            return null;
         }
     }
 }
