@@ -2,6 +2,7 @@
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Eduhunt.Applications.ProfileService
 {
@@ -15,6 +16,13 @@ namespace Eduhunt.Applications.ProfileService
                     context,
                     httpContextAccessor)
         {
+        }
+
+        public string GetEmailFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+            return jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value ?? string.Empty;
         }
 
         //get profile by user id

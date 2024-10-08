@@ -1,22 +1,11 @@
-#pragma warning disable CS8604 // Possible null reference argument.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-#pragma warning disable CS8603 // Possible null reference return.
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-using Amazon.Extensions.CognitoAuthentication;
-using CloudinaryDotNet;
 using Eduhunt.Applications.ApplicactionUsers;
 using Eduhunt.Applications.Payment;
 using Eduhunt.Applications.ProfileService;
-using Eduhunt.Data;
 using Eduhunt.Infrastructures.Cloud;
-using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 using System.Web;
 
 namespace Eduhunt.Pages
@@ -24,141 +13,121 @@ namespace Eduhunt.Pages
     public class ProfileModel : PageModel
     {
         [BindProperty]
-        public Profile? profile { get; set; }
+        public Profile Profile { get; set; } = new Profile();
+
         [BindProperty]
-        public IFormFile? Upload { get; set; }
+        public IFormFile? UploadAvatar { get; set; }
+
         [BindProperty]
-        public bool? IsVIP { get; set; } = false;
-        private readonly IServiceProvider _serviceProvider;
+        public IFormFile? UploadCertificate { get; set; }
+
+        public bool IsVIP { get; set; }
+        public bool IsMentor { get; set; }
+
         private readonly ProfileService _profileService;
         private readonly ApplicationUserService _userService;
         private readonly PaymentService _paymentService;
+        private readonly CloudinaryService _cloudinaryService;
 
-        public ProfileModel(IServiceProvider serviceProvider)
+        public ProfileModel(ProfileService profileService, ApplicationUserService userService,
+                            PaymentService paymentService, CloudinaryService cloudinaryService)
         {
-            _serviceProvider = serviceProvider;
-            _profileService = _serviceProvider.GetRequiredService<ProfileService>();
-            _userService = _serviceProvider.GetRequiredService<ApplicationUserService>();
-            _paymentService = _serviceProvider.GetRequiredService<PaymentService>();
-
-
+            _profileService = profileService;
+            _userService = userService;
+            _paymentService = paymentService;
+            _cloudinaryService = cloudinaryService;
         }
-        public async Task<IActionResult> OnGet(string status, string email)
+
+        public async Task<IActionResult> OnGetAsync(string? status, string? email)
         {
-
-            // Get the user ID from the cookie
-
-            var userEmail = GetUserEmailFromCookie();
-            if (userEmail == null)
-            {
-                userEmail = email;
-            }
+            var userEmail = GetUserEmailFromToken() ?? email;
+            if (string.IsNullOrEmpty(userEmail))
+                return RedirectToPage("/Identity/Login");
 
             if (status == "PAID")
-            {
                 await _userService.UpdateVIPStatusByEmailAsync(userEmail, true);
-            }
 
-            // get profile by user id
-            profile = await _profileService.GetProfileByUserEmailAsync(userEmail);
-            IsVIP = await _userService.GetVIPStatusByEmailAsync(userEmail);
+            await LoadUserProfile(userEmail);
             return Page();
         }
 
-        public async Task<IActionResult> OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
-            var userEmail = GetUserEmailFromCookie();
-            var profileDb = await _profileService.GetProfileByUserEmailAsync(userEmail);
-
-            var _cloudinaryService = _serviceProvider.GetRequiredService<CloudinaryService>();
-
-            string? url = null;
-
-            if (Upload != null)
-            {
-                url = await _cloudinaryService.UploadSingleAsync(Upload);
-            }
-
-            if (url != null)
-            {
-                profile!.AvatarImage = url;
-            }
-            else
-            {
-                profile!.AvatarImage = profileDb.AvatarImage;
-
-            }
-            //validation
-            if (profile.FirstName != null && profile.FirstName.Any(char.IsDigit))
-            {
-                ModelState.AddModelError("profile.FirstName", "First name cannot contain numbers");
-            }
-            if (profile.LastName != null && profile.LastName.Any(char.IsDigit))
-            {
-                ModelState.AddModelError("profile.LastName", "Last name cannot contain numbers");
-            }
-            if (profile.UserName.Any(char.IsWhiteSpace))
-            {
-                ModelState.AddModelError("profile.UserName", "Username cannot contain spaces");
-            }
-            // Update the PhoneNumber validation to allow null values
-            if (profile.PhoneNumber != null && profile.PhoneNumber.Any(char.IsLetter))
-            {
-                ModelState.AddModelError("profile.PhoneNumber", "Phone number cannot contain letters");
-            }
-           
-            // check email format 
-            if (!new EmailAddressAttribute().IsValid(profile.Email))
-            {
-                ModelState.AddModelError("profile.Email", "Invalid email format");
-            }
+            var userEmail = GetUserEmailFromToken();
+            if (string.IsNullOrEmpty(userEmail))
+                return RedirectToPage("/Identity/Login");
 
             if (!ModelState.IsValid)
-            {
                 return Page();
-            }
 
+            var profileDb = await _profileService.GetProfileByUserEmailAsync(userEmail);
+            if (profileDb == null)
+                return NotFound("Profile not found");
 
-            //update profile
-            profileDb!.FirstName = profile!.FirstName;
-            profileDb!.LastName = profile!.LastName;
-            profileDb!.UserName = profile!.UserName.Trim();
-            profileDb!.Email = profile!.Email.Trim();
-            profileDb!.PhoneNumber = profile!.PhoneNumber;
-            profileDb!.Country = profile!.Country;
-            profileDb!.City = profile!.City;
-
-            profileDb!.Title = profile!.Title;
-
-            if (profile!.AvatarImage != null)
-            {
-                profileDb!.AvatarImage = profile!.AvatarImage;
-
-            }
+            await UpdateProfileImages(profileDb);
+            UpdateProfileProperties(profileDb);
 
             await _profileService.UpdateAsync(profileDb);
             return RedirectToPage("/Profile");
         }
 
-        public string GetUserEmailFromCookie()
+        public async Task<IActionResult> OnPostPayVIPAsync()
         {
-            if (HttpContext.Request.Cookies.TryGetValue("userEmail", out var userEmail))
-            {
-                return userEmail;
-            }
+            var userEmail = GetUserEmailFromToken();
+            if (string.IsNullOrEmpty(userEmail))
+                return RedirectToPage("/Identity/Login");
 
+            var encodedEmail = HttpUtility.UrlEncode(userEmail);
+            var baseUrl = $"https://localhost:7099/Profile?email={encodedEmail}";
+            var returnUrl = await _paymentService.PaymentProcessing(
+                $"{baseUrl}",
+                $"{baseUrl}&status=PAID",
+                "VIP", 1, 4000);
+
+            return Redirect(returnUrl);
+        }
+
+        private string? GetUserEmailFromToken()
+        {
+            if (HttpContext.Request.Cookies.TryGetValue("IdToken", out var idToken))
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadToken(idToken) as JwtSecurityToken;
+                return jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value;
+            }
             return null;
         }
 
-        public async Task<IActionResult> OnPostPayVIP()
+        private async Task LoadUserProfile(string userEmail)
         {
-            var userEmail = GetUserEmailFromCookie();
-            var encodedEmail = HttpUtility.UrlEncode(userEmail);
-            var cancelURL = $"https://localhost:7099/Profile?email={encodedEmail}";
-            var successURL = $"https://localhost:7099/Profile?email={encodedEmail}";
+            Profile = await _profileService.GetProfileByUserEmailAsync(userEmail) ?? new Profile();
+            IsVIP = await _userService.GetVIPStatusByEmailAsync(userEmail);
+            IsMentor = await _userService.IsMentorAsync(userEmail);
+        }
 
-            var returnUrl = await _paymentService.PaymentProcessing(cancelURL, successURL, "VIP", 1, 4000);
-            return Redirect(returnUrl);
+        private async Task UpdateProfileImages(Profile profileDb)
+        {
+            Profile.AvatarImage = UploadAvatar != null
+                ? await _cloudinaryService.UploadSingleAsync(UploadAvatar)
+                : profileDb.AvatarImage;
+
+            Profile.CertificateImage = UploadCertificate != null
+                ? await _cloudinaryService.UploadSingleAsync(UploadCertificate)
+                : profileDb.CertificateImage;
+        }
+
+        private void UpdateProfileProperties(Profile profileDb)
+        {
+            profileDb.FirstName = Profile.FirstName?.Trim();
+            profileDb.LastName = Profile.LastName?.Trim();
+            profileDb.UserName = Profile.UserName?.Trim();
+            profileDb.Email = Profile.Email?.Trim();
+            profileDb.PhoneNumber = Profile.PhoneNumber?.Trim();
+            profileDb.Country = Profile.Country?.Trim();
+            profileDb.City = Profile.City?.Trim();
+            profileDb.Title = Profile.Title?.Trim();
+            profileDb.AvatarImage = Profile.AvatarImage;
+            profileDb.CertificateImage = Profile.CertificateImage;
         }
     }
 }

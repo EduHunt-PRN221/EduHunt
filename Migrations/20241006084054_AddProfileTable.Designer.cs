@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Eduhunt.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241005135239_add profile table")]
-    partial class addprofiletable
+    [Migration("20241006084054_AddProfileTable")]
+    partial class AddProfileTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,9 +33,6 @@ namespace Eduhunt.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
-
-                    b.Property<string>("AvatarUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -140,6 +137,10 @@ namespace Eduhunt.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("AvatarImage")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CertificateImage")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -326,7 +327,8 @@ namespace Eduhunt.Migrations
                 {
                     b.HasOne("Eduhunt.Models.Entities.ApplicationUser", "ApplicationUser")
                         .WithOne()
-                        .HasForeignKey("Eduhunt.Models.Entities.Profile", "ApplicationUserId");
+                        .HasForeignKey("Eduhunt.Models.Entities.Profile", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("ApplicationUser");
                 });

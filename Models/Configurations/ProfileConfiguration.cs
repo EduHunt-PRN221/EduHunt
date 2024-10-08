@@ -1,4 +1,5 @@
 ﻿using Eduhunt.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Eduhunt.Models.Configurations
@@ -18,11 +19,13 @@ namespace Eduhunt.Models.Configurations
             builder.Property(c => c.City).HasMaxLength(100);
             builder.Property(c => c.Title).HasMaxLength(100);
             builder.Property(c => c.AvatarImage).HasMaxLength(100);
+            builder.Property(c => c.CertificateImage).HasMaxLength(100);
 
 
             builder.HasOne(c => c.ApplicationUser)
                 .WithOne()
-                .HasForeignKey<Profile>(c => c.ApplicationUserId);
+                .HasForeignKey<Profile>(c => c.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using Eduhunt.Applications.ApplicactionUsers;
+﻿using Amazon.CognitoIdentityProvider;
+using Eduhunt.Applications.ApplicactionUsers;
 using Eduhunt.Applications.Cvs;
 using Eduhunt.Applications.Payment;
 using Eduhunt.Applications.ProfileService;
-using Eduhunt.Infrastructures.Cloud;
 
 namespace Eduhunt
 {
@@ -10,6 +10,7 @@ namespace Eduhunt
     {
         public static IServiceCollection AddAllCustomServices(this IServiceCollection services)
         {
+            services.AddAWSService<IAmazonCognitoIdentityProvider>();
             services.AddScoped<CvService>();
             services.AddScoped<ApplicationUserService>();
             services.AddScoped<ProfileService>();

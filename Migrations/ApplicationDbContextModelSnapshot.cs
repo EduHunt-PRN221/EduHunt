@@ -31,9 +31,6 @@ namespace Eduhunt.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("AvatarUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -137,6 +134,10 @@ namespace Eduhunt.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("AvatarImage")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CertificateImage")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -323,7 +324,8 @@ namespace Eduhunt.Migrations
                 {
                     b.HasOne("Eduhunt.Models.Entities.ApplicationUser", "ApplicationUser")
                         .WithOne()
-                        .HasForeignKey("Eduhunt.Models.Entities.Profile", "ApplicationUserId");
+                        .HasForeignKey("Eduhunt.Models.Entities.Profile", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("ApplicationUser");
                 });

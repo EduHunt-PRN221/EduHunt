@@ -73,6 +73,17 @@ namespace Eduhunt.Applications.ApplicactionUsers
             return userId!;
         }
 
+        public async Task<bool> IsMentorAsync(string userEmail)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user != null)
+            {
+                var role = await _userManager.GetRolesAsync(user);
+                return role.Contains("Mentor");
+            }
+            return false;
+        }
+
         public async Task<bool> GetVIPStatusByEmailAsync(string email)
         {
             bool? status = await _context.Users

@@ -1,46 +1,29 @@
 ﻿@page
 @model Eduhunt.Pages.ProfileModel
-@{
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject Microsoft.AspNetCore.Identity.UserManager<Eduhunt.Models.Entities.ApplicationUser> UserManager
 
-}
 <form hidden asp-page-handler="payVIP" method="post" id="formPay">
     <button type="submit">Pay</button>
 </form>
-<div style="background-color: #f8f9fa;">
+<div class="bg-light">
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 bg-white p-4" style="border-right: 1px solid #e0e0e0;">
-                <div class="d-flex align-items-center mb-4">
-                    <i class="fas fa-edit text-dark fa-2x">
-                    </i>
-                    <a class="ml-2 h4 font-weight-bold" href="#" style="color: rgb(0, 0, 0);">
-                        Edit profile
-                    </a>
-                </div>
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-lock text-muted fa-2x">
-                    </i>
-                    <a class="ml-2 h4 text-muted" href="#">
-                        Change password
-                    </a>
-                </div>
-            </div>
+            <partial name="_Sidebar" />
             <!-- Main Content -->
             <div class="col-md-9 p-4">
-              
+                <h1 class="mb-4">Profile</h1>
                 <form method="post" enctype="multipart/form-data">
                     <div class="d-flex flex-column align-items-start mb-4">
                         <div class="border p-2">
-                            <div class="position-relative  mb-3 bg-white rounded"
+                            <div class="position-relative mb-3 bg-white rounded"
                                  style="width: 200px; height: 200px; display: flex; justify-content: center; align-items: center;">
-                                <img id="selectedImage" alt="Profile picture of a person" class="img-thumbnail" height="200"
-                                     src="@(Model.profile?.AvatarImage ?? "https://shorturl.at/cHJyG")" width="250" style="object-fit: cover;" />
+                                <img id="selectedImage" alt="Profile picture" class="img-thumbnail" height="200"
+                                     src="@(Model.Profile?.AvatarImage ?? "/images/default-avatar.png")" width="200" style="object-fit: cover;" />
 
-                                <label class="position-absolute w-100 bg-dark text-white text-center py-1 " style="opacity: 0.7; cursor: pointer; bottom: 0;">
-                                    <input asp-for="Upload" type="file" class="form-control d-none" onchange="displaySelectedImage(event, 'selectedImage')" />
+                                <label for="uploadAvatar" class="position-absolute w-100 bg-dark text-white text-center py-1" style="opacity: 0.7; cursor: pointer; bottom: 0;">
+                                    <input id="uploadAvatar" asp-for="UploadAvatar" type="file" class="form-control d-none" accept="image/*" onchange="displaySelectedImage(event, 'selectedImage')" />
                                     Upload Photo
-
                                 </label>
                             </div>
                             <div class="text-muted small text-center" style="width: 200px;">
@@ -48,92 +31,72 @@
                             </div>
                         </div>
                     </div>
-                    @if (Model.IsVIP.HasValue && Model.IsVIP.Value)
+                    @if (Model.IsMentor)
                     {
-                        <button class="btn btn-warning fs-4 text-center py-2 fw-bold mb-4 w-100"
-                                style="background-color: #f1c40f; color:#160270;" disabled>
+                        <div class="mb-3">
+                            <label for="uploadCertificate" class="form-label">Upload Certificate</label>
+                            <input id="uploadCertificate" asp-for="UploadCertificate" type="file" class="form-control" accept="image/*" onchange="displaySelectedImage(event, 'certificateImage')" />
+                            <img id="certificateImage" src="@Model.Profile?.CertificateImage" style="display: none" />
+                        </div>
+                    }
+                    @if (Model.IsVIP)
+                    {
+                        <div class="alert alert-warning fs-4 text-center py-2 fw-bold mt-2 mb-4">
                             VIP Account
-                        </button>
+                        </div>
                     }
                     else
                     {
-                        <button id="submitPayButton" class="btn btn-warning text-white text-center py-2 mb-4 w-100"
+                        <button id="submitPayButton" class="btn btn-warning text-white text-center py-2 mt-2 mb-4 w-100"
                                 style="background-color: #160270;">
                             Pay To Be VIP
                         </button>
                     }
-                    
-                    <div class="form-row mb-4">
-                        <div class="col">
-                            <label class="text-dark">
-                                Full name
-                            </label>
-                            <input class="form-control" placeholder="First name" type="text" asp-for="profile.FirstName" />
-                            <span asp-validation-for="profile.FirstName" class="text-danger"></span>
 
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Profile.FirstName" class="form-label">First name</label>
+                            <input asp-for="Profile.FirstName" class="form-control" placeholder="First name" />
+                            <span asp-validation-for="Profile.FirstName" class="text-danger"></span>
                         </div>
-                        <div class="col">
-                            <label class="text-dark">
-                                &nbsp;
-                            </label>
-                            <input class="form-control" placeholder="Last name" type="text" asp-for="profile.LastName" />
-                            <span asp-validation-for="profile.LastName" class="text-danger"></span>
-
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Profile.LastName" class="form-label">Last name</label>
+                            <input asp-for="Profile.LastName" class="form-control" placeholder="Last name" />
+                            <span asp-validation-for="Profile.LastName" class="text-danger"></span>
                         </div>
                     </div>
-                    <div class="form-group mb-4">
-                        <label class="text-dark">
-                            Username
-                        </label>
-                        <input class="form-control" placeholder="Enter your username" type="text" asp-for="profile.UserName" required/>
-                        <span asp-validation-for="profile.UserName" class="text-danger"></span>
-
+                    <div class="mb-3">
+                        <label asp-for="Profile.UserName" class="form-label">Username</label>
+                        <input asp-for="Profile.UserName" class="form-control" placeholder="Enter your username" required />
+                        <span asp-validation-for="Profile.UserName" class="text-danger"></span>
                     </div>
-                    <div class="form-group mb-4">
-                        <label class="text-dark">
-                            Email
-                        </label>
-                        <input class="form-control" placeholder="Email address" type="email" asp-for="profile.Email" required/>
-                        <span asp-validation-for="profile.Email" class="text-danger"></span>
-
+                    <div class="mb-3">
+                        <label asp-for="Profile.Email" class="form-label">Email</label>
+                        <input asp-for="Profile.Email" class="form-control" placeholder="Email address" required />
+                        <span asp-validation-for="Profile.Email" class="text-danger"></span>
                     </div>
-                    <div class="form-group mb-4">
-                        <label class="text-dark">
-                            Contact number
-                        </label>
-                        <input class="form-control" placeholder="Phone number" type="text" asp-for="profile.PhoneNumber" />
-                        <span asp-validation-for="profile.PhoneNumber" class="text-danger"></span>
-
+                    <div class="mb-3">
+                        <label asp-for="Profile.PhoneNumber" class="form-label">Contact number</label>
+                        <input asp-for="Profile.PhoneNumber" class="form-control" placeholder="Phone number" />
+                        <span asp-validation-for="Profile.PhoneNumber" class="text-danger"></span>
                     </div>
-                    <div class="form-row mb-4">
-                        <div class="col">
-                            <label class="text-dark">
-                                Country
-                            </label>
-                            <input class="form-control" placeholder="Country" type="text" asp-for="profile.Country" />
-                            <span asp-validation-for="profile.Country" class="text-danger"></span>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Profile.Country" class="form-label">Country</label>
+                            <input asp-for="Profile.Country" class="form-control" placeholder="Country" />
+                            <span asp-validation-for="Profile.Country" class="text-danger"></span>
                         </div>
-                        <div class="col">
-                            <label class="text-dark">
-                                City
-                            </label>
-                            <input class="form-control" placeholder="City" type="text" asp-for="profile.City" />
-                            <span asp-validation-for="profile.City" class="text-danger"></span>
-
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Profile.City" class="form-label">City</label>
+                            <input asp-for="Profile.City" class="form-control" placeholder="City" />
+                            <span asp-validation-for="Profile.City" class="text-danger"></span>
                         </div>
                     </div>
-                    <div class="form-group mb-4">
-                        <label class="text-dark">
-                            Title
-                        </label>
-                        <input class="form-control" placeholder="Your title, profession or small biography"
-                               type="text" asp-for="profile.Title" />
-                        <div class="text-right text-muted small">
-                            0/50
-                        </div>
+                    <div class="mb-3">
+                        <label asp-for="Profile.Title" class="form-label">Title</label>
+                        <input asp-for="Profile.Title" class="form-control" placeholder="Your title, profession or small biography" />
                     </div>
-                    <button class="btn btn-primary" style="background-color: #001f3f; border-color: #001f3f;"
-                            type="submit">
+                    <button class="btn btn-primary" type="submit">
                         Save Changes
                     </button>
                 </form>
@@ -141,28 +104,30 @@
         </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    function displaySelectedImage(event, elementId) {
-        const selectedImage = document.getElementById(elementId);
-        const fileInput = event.target;
 
-        if (fileInput.files && fileInput.files[0]) {
-            const reader = new FileReader();
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function displaySelectedImage(event, elementId) {
+            const selectedImage = document.getElementById(elementId);
+            const fileInput = event.target;
 
-            reader.onload = function (e) {
-                selectedImage.src = e.target.result;
-            };
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
 
-            reader.readAsDataURL(fileInput.files[0]);
+                reader.onload = function (e) {
+                    selectedImage.src = e.target.result;
+                };
+
+                reader.readAsDataURL(fileInput.files[0]);
+            }
         }
-    }
 
-    $(document).ready(function () {
-        $('#submitPayButton').click(function (event) {
-            event.preventDefault(); 
-            console.log('submitPayButton');
-            $('#formPay button[type="submit"]').click();
+        $(document).ready(function () {
+            $('#submitPayButton').click(function (event) {
+                event.preventDefault();
+                $('#formPay button[type="submit"]').click();
+            });
         });
-    });
-</script>
+    </script>
+}
