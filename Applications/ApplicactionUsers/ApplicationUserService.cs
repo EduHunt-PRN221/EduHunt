@@ -1,6 +1,9 @@
-﻿using Eduhunt.Data;
+﻿using Amazon.CognitoIdentityProvider;
+using Amazon.CognitoIdentityProvider.Model;
+using Eduhunt.Data;
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,16 +14,19 @@ namespace Eduhunt.Applications.ApplicactionUsers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IAmazonCognitoIdentityProvider _cognitoProvider;
 
         public ApplicationUserService(
             ApplicationDbContext context,
             IHttpContextAccessor httpContextAccessor,
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager) :
+            RoleManager<IdentityRole> roleManager,
+            IAmazonCognitoIdentityProvider cognitoProvider) :
                 base(context, httpContextAccessor)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _cognitoProvider = cognitoProvider;
         }
 
         public async Task<List<SelectListItem>> GetAllRolesAsync()
@@ -106,6 +112,44 @@ namespace Eduhunt.Applications.ApplicactionUsers
                 user.IsVIP = status;
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<bool> GlobalSignOut()
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext!.User.Identity!.IsAuthenticated)
+            {
+                try
+                {
+                    var accessToken = await httpContext.GetTokenAsync("AccessToken");
+
+                    if (string.IsNullOrEmpty(accessToken))
+                    {
+                        return false;
+                    }
+
+                    await _cognitoProvider.GlobalSignOutAsync(new GlobalSignOutRequest
+                    {
+                        AccessToken = accessToken
+                    });
+
+                    await httpContext.SignOutAsync();
+
+                    return true;
+                }
+                catch (Amazon.CognitoIdentityProvider.Model.NotAuthorizedException)
+                {
+                    await httpContext.SignOutAsync();
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred during global sign out: {ex.Message}");
+                    return false;
+                }
+            }
+
+            return false;
         }
     }
 }

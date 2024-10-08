@@ -33,12 +33,10 @@ namespace Eduhunt.Infrastructures.Middleware
                 }
                 catch (NotAuthorizedException)
                 {
-                    // Token is invalid or has been revoked
                     ClearAuthCookies(context);
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception
                     Console.WriteLine($"Error validating token: {ex.Message}");
                 }
             }
