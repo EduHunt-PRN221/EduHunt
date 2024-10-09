@@ -16,7 +16,7 @@ builder.Services.AddRazorPages();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("No default connection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseNpgsql(connectionString));
 
 builder.Services
     .Configure<IdentitySetting>(builder.Configuration.GetSection(IdentitySetting.IdentitySettingName));
@@ -80,8 +80,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
-app.UseTokenValidation();
-app.UseTokenRefresh();
+//app.UseTokenValidation();
+//app.UseTokenRefresh();
 app.UseAuthorization();
 
 app.MapRazorPages();
