@@ -1,6 +1,4 @@
-﻿@using Amazon.Extensions.CognitoAuthentication
-@using Amazon.CognitoIdentityProvider
-@using Eduhunt.Applications.ProfileService
+﻿@using Eduhunt.Applications.ProfileService
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @inject IServiceProvider ServiceProvider
 
@@ -62,7 +60,7 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="/profile">View Profile</a></li>
-                        <li><a class="dropdown-item" href="#">Logout</a></li>
+                        <li><button class="dropdown-item" onclick="signout()">Logout</button></li>
                     </ul>
                 </div>
             }
@@ -113,6 +111,14 @@
         </div>
     </footer>
 
+    <script>
+        function signout() {
+            document.cookie = "AccessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+            document.cookie = "IdToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "RefreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+            window.location.href = "/Identity/Login";
+        }
+    </script>
     <script src="https://cdn.syncfusion.com/ej2/20.2.43/dist/ej2.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
