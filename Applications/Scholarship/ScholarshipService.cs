@@ -42,15 +42,15 @@ namespace Eduhunt.Applications.Scholarship
             return;
         }
 
-        public async Task<IEnumerable<Models.Entities.Scholarship>> GetScholarshipInfo()
-        {
-            return await _context.Scholarships.ToListAsync();
-        }
+        //public async Task<IEnumerable<Models.Entities.Scholarship>> GetScholarshipInfo()
+        //{
+        //    return await _context.Scholarships.ToListAsync();
+        //}
 
-        public async Task<Models.Entities.Scholarship> GetScholarshipInfoById(Guid id)
-        {
-            return await _context.Scholarships.FindAsync(id);
-        }
+        //public async Task<Models.Entities.Scholarship> GetScholarshipInfoById(Guid id)
+        //{
+        //    return await _context.Scholarships.FindAsync(id);
+        //}
 
         public async Task<IEnumerable<Models.Entities.UserScholarship>> GetUserScholarshipInfo()
         {
@@ -81,61 +81,61 @@ namespace Eduhunt.Applications.Scholarship
             return scholarshipDtos;
         }
 
-        public async Task PostScholarshipInfo(ScholarshipDto scholarshipInfo)
-        {
-            scholarshipInfo.Id = Guid.NewGuid().ToString();
-            scholarshipInfo.IsInSite = true;
-            var scholarship = new Models.Entities.Scholarship
-            {
-                Id = scholarshipInfo.Id,
-                Title = scholarshipInfo.Title,
-                Budget = scholarshipInfo.Budget,
-                Location = scholarshipInfo.Location,
-                SchoolName = scholarshipInfo.SchoolName,
-                Level = scholarshipInfo.Level,
-                Url = scholarshipInfo.Url,
-                IsApproved = false,
-                IsInSite = scholarshipInfo.IsInSite,
-                ImageUrl = scholarshipInfo.ImageUrl,
-                Description = scholarshipInfo.Description,
-                CreatedAt = DateTime.UtcNow,
-                AuthorId = scholarshipInfo.AuthorId,
-                ScholarshipCategories = [],
-            };
-            _context.Scholarships.Add(scholarship);
+        //public async Task PostScholarshipInfo(ScholarshipDto scholarshipInfo)
+        //{
+        //    scholarshipInfo.Id = Guid.NewGuid().ToString();
+        //    scholarshipInfo.IsInSite = true;
+        //    var scholarship = new Models.Entities.Scholarship
+        //    {
+        //        Id = scholarshipInfo.Id,
+        //        Title = scholarshipInfo.Title,
+        //        Budget = scholarshipInfo.Budget,
+        //        Location = scholarshipInfo.Location,
+        //        SchoolName = scholarshipInfo.SchoolName,
+        //        Level = scholarshipInfo.Level,
+        //        Url = scholarshipInfo.Url,
+        //        IsApproved = false,
+        //        IsInSite = scholarshipInfo.IsInSite,
+        //        ImageUrl = scholarshipInfo.ImageUrl,
+        //        Description = scholarshipInfo.Description,
+        //        CreatedAt = DateTime.UtcNow,
+        //        AuthorId = scholarshipInfo.AuthorId,
+        //        ScholarshipCategories = [],
+        //    };
+        //    _context.Scholarships.Add(scholarship);
 
-            await _context.SaveChangesAsync();
+        //    await _context.SaveChangesAsync();
 
-            return;
-        }
+        //    return;
+        //}
 
-        public async Task PutScholarshipInfo(string id, Models.Entities.Scholarship scholarshipInfo)
-        {
-            if (id != scholarshipInfo.Id)
-            {
-                return;
-            }
+        //public async Task PutScholarshipInfo(string id, Models.Entities.Scholarship scholarshipInfo)
+        //{
+        //    if (id != scholarshipInfo.Id)
+        //    {
+        //        return;
+        //    }
 
-            _context.Entry(scholarshipInfo).State = EntityState.Modified;
+        //    _context.Entry(scholarshipInfo).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ScholarshipInfoExists(id))
-                {
-                    return;
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!ScholarshipInfoExists(id))
+        //        {
+        //            return;
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return;
-        }
+        //    return;
+        //}
 
         private bool ScholarshipInfoExists(string id)
         {

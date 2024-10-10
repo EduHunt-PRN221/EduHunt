@@ -114,73 +114,73 @@ namespace Eduhunt.Applications.Survey
             }
         }
 
-        public async Task UpdateSurvey(SurveyAnswerDto surveyobj)
-        {
-            if (_context == null)
-            {
-                return ;
-            }
+        //public async Task UpdateSurvey(SurveyAnswerDto surveyobj)
+        //{
+        //    if (_context == null)
+        //    {
+        //        return ;
+        //    }
 
-            try
-            {
-                var survey = await _context.Surveys.FirstOrDefaultAsync(sa => sa.Id == surveyobj.SurveyId);
-                if (survey == null)
-                {
-                    return;
-                }
+        //    try
+        //    {
+        //        var survey = await _context.Surveys.FirstOrDefaultAsync(sa => sa.Id == surveyobj.SurveyId);
+        //        if (survey == null)
+        //        {
+        //            return;
+        //        }
 
-                survey.Title = surveyobj.Title;
-                survey.Description = surveyobj.Description;
-                survey.CreateAt = DateTime.Now;
-                _context.Surveys.Update(survey);
+        //        survey.Title = surveyobj.Title;
+        //        survey.Description = surveyobj.Description;
+        //        survey.CreateAt = DateTime.Now;
+        //        _context.Surveys.Update(survey);
 
-                var existingSurveyAnswers = await _context.SurveyAnswers.Where(sa => sa.SurveyId == surveyobj.SurveyId).ToListAsync();
-                _context.SurveyAnswers.RemoveRange(existingSurveyAnswers);
+        //        var existingSurveyAnswers = await _context.SurveyAnswers.Where(sa => sa.SurveyId == surveyobj.SurveyId).ToListAsync();
+        //        _context.SurveyAnswers.RemoveRange(existingSurveyAnswers);
 
-                foreach (string answerid in surveyobj.AnswerIds)
-                {
-                    var answer = await _context.Answers.FirstOrDefaultAsync(a => a.Id == answerid);
-                    if (answer != null)
-                    {
-                        var new_answer = new SurveyAnswer
-                        {
-                            AnswerId = answerid,
-                            SurveyId = surveyobj.SurveyId,
-                        };
-                        _context.SurveyAnswers.Add(new_answer);
-                    }
-                }
-                await _context.SaveChangesAsync();
+        //        foreach (string answerid in surveyobj.AnswerIds)
+        //        {
+        //            var answer = await _context.Answers.FirstOrDefaultAsync(a => a.Id == answerid);
+        //            if (answer != null)
+        //            {
+        //                var new_answer = new SurveyAnswer
+        //                {
+        //                    AnswerId = answerid,
+        //                    SurveyId = surveyobj.SurveyId,
+        //                };
+        //                _context.SurveyAnswers.Add(new_answer);
+        //            }
+        //        }
+        //        await _context.SaveChangesAsync();
 
-                return;
-            }
-            catch (Exception ex)
-            {
-                return;
-            }
-        }
+        //        return;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return;
+        //    }
+        //}
 
-        public async Task<ICollection<SurveyDto>> GetAll()
-        {
-            if (_context == null)
-            {
-                return null!;
-            }
+        //public async Task<ICollection<SurveyDto>> GetAll()
+        //{
+        //    if (_context == null)
+        //    {
+        //        return null!;
+        //    }
 
-            var surveys = await _context.Surveys
-                .Include(s => s.SurveyAnswers)
-                .Select(s => new SurveyDto
-                {
-                    UserId = s.UserId,
-                    SurveyAnswers = s.SurveyAnswers.Select(sa => new GetSurvey
-                    {
-                        Question = sa.Answer.Question.Content,
-                        Answer = sa.Answer.AnswerText
-                    }).ToList()
-                }).ToListAsync();
+        //    var surveys = await _context.Surveys
+        //        .Include(s => s.SurveyAnswers)
+        //        .Select(s => new SurveyDto
+        //        {
+        //            UserId = s.UserId,
+        //            SurveyAnswers = s.SurveyAnswers.Select(sa => new GetSurvey
+        //            {
+        //                Question = sa.Answer.Question.Content,
+        //                Answer = sa.Answer.AnswerText
+        //            }).ToList()
+        //        }).ToListAsync();
 
-            return surveys;
-        }
+        //    return surveys;
+        //}
 
         public async Task<SurveyDto> GetByUserId(string userId)
         {

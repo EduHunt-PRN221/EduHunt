@@ -24,7 +24,7 @@ public class ScholarshipRepository : IScholarship
     private readonly ApplicationDbContext _dbContext;
     private readonly string _apiKey;
     private readonly SurveyService _surveyService;
-    private readonly ScholarshipService _scholarshipService; 
+    private readonly ScholarshipService _scholarshipService;
 
     public ScholarshipRepository(ApplicationDbContext dbContext, IConfiguration configuration)
     {
