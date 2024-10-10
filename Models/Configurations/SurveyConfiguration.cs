@@ -10,7 +10,7 @@ namespace Eduhunt.Models.Configurations
         {
             base.Configure(builder);
 
-            builder.HasKey(e => e.Id).HasName("PK__Survey__A5481F9D0CCB73F0");
+            builder.HasKey(e => e.Id);
             builder.ToTable("Survey");
             builder.HasIndex(e => e.UserId, "UQ__Survey__1788CCAD0C472ADB").IsUnique();
             builder.Property(e => e.Id)

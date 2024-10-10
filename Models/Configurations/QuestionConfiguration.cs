@@ -11,7 +11,7 @@ namespace Eduhunt.Models.Configurations
         {
             base.Configure(builder);
 
-            builder.HasKey(e => e.Id).HasName("PK__Question__0DC06F8C4764F5B1");
+            builder.HasKey(e => e.Id);
 
             builder.ToTable("Question");
 

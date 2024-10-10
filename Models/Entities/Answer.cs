@@ -4,7 +4,7 @@ namespace Eduhunt.Models.Entities
 {
     public partial class Answer : _Base
     {
-        public string QuestionId { get; set; }
+        public required string QuestionId { get; set; }
 
         public string AnswerText { get; set; } = default!;
 

@@ -1,5 +1,5 @@
-﻿using Eduhunt.Applications.Scholarship;
-using Eduhunt.Applications.Survey;
+﻿using Eduhunt.Applications.Scholarships;
+using Eduhunt.Applications.Surveys;
 using Eduhunt.Data;
 using Eduhunt.DTOs;
 using Eduhunt.Infrastructures.Repositories;
@@ -14,9 +14,9 @@ using System.Text;
 
 public class Url
 {
-    public string URL { get; set; }
+    public required string URL { get; set; }
     public int ParentPage { get; set; }
-    public string CssSelector { get; set; }
+    public required string CssSelector { get; set; }
 }
 
 public class ScholarshipRepository : IScholarship
@@ -26,10 +26,12 @@ public class ScholarshipRepository : IScholarship
     private readonly SurveyService _surveyService;
     private readonly ScholarshipService _scholarshipService;
 
-    public ScholarshipRepository(ApplicationDbContext dbContext, IConfiguration configuration)
+    public ScholarshipRepository(ApplicationDbContext dbContext, IConfiguration configuration, SurveyService surveyService, ScholarshipService scholarshipService)
     {
         _dbContext = dbContext;
-        _apiKey = configuration["ChatGPT:Key"];
+        _apiKey = configuration["ChatGPT:Key"] ?? "";
+        _surveyService = surveyService;
+        _scholarshipService = scholarshipService;
     }
 
     public async Task<List<Scholarship>> GetRecommendedScholarships(string userId)

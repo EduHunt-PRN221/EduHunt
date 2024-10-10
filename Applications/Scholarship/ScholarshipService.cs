@@ -2,21 +2,20 @@
 using Eduhunt.Data;
 using Eduhunt.DTOs;
 using Eduhunt.Infrastructures.Repositories;
+using Eduhunt.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Eduhunt.Applications.Scholarship
+namespace Eduhunt.Applications.Scholarships
 {
-    public class ScholarshipService : Repository<Models.Entities.Scholarship>
+    public class ScholarshipService : Repository<Scholarship>
     {
         public ScholarshipService(
             ApplicationDbContext context,
-            IHttpContextAccessor httpContextAccessor,
-            IMapper mapper) :
+            IHttpContextAccessor httpContextAccessor) :
                 base(
                     context,
-                    httpContextAccessor,
-                    mapper)
+                    httpContextAccessor)
         {
         }
 
@@ -52,7 +51,7 @@ namespace Eduhunt.Applications.Scholarship
         //    return await _context.Scholarships.FindAsync(id);
         //}
 
-        public async Task<IEnumerable<Models.Entities.UserScholarship>> GetUserScholarshipInfo()
+        public async Task<IEnumerable<UserScholarship>> GetUserScholarshipInfo()
         {
             return await _context.UserScholarships.ToListAsync();
         }
@@ -70,44 +69,44 @@ namespace Eduhunt.Applications.Scholarship
             var scholarshipDtos = userScholarships.Select(us => new ScholarshipInfoDto
             {
                 Id = us.ScholarshipInfo.Id,
-                Title = us.ScholarshipInfo.Title,
-                Budget = us.ScholarshipInfo.Budget,
-                Location = us.ScholarshipInfo.Location,
-                School_name = us.ScholarshipInfo.SchoolName,
-                Level = us.ScholarshipInfo.Level,
-                Url = us.ScholarshipInfo.Url
+                Title = us.ScholarshipInfo.Title ?? "Undefined Title",
+                Budget = us.ScholarshipInfo.Budget ?? "Undefined Budget",
+                Location = us.ScholarshipInfo.Location ?? "Undefined Location",
+                School_name = us.ScholarshipInfo.SchoolName ?? "Undefined SchoolName",
+                Level = us.ScholarshipInfo.Level ?? "Undefined Level",
+                Url = us.ScholarshipInfo.Url ?? "Undefined Url"
             });
 
             return scholarshipDtos;
         }
 
-        //public async Task PostScholarshipInfo(ScholarshipDto scholarshipInfo)
-        //{
-        //    scholarshipInfo.Id = Guid.NewGuid().ToString();
-        //    scholarshipInfo.IsInSite = true;
-        //    var scholarship = new Models.Entities.Scholarship
-        //    {
-        //        Id = scholarshipInfo.Id,
-        //        Title = scholarshipInfo.Title,
-        //        Budget = scholarshipInfo.Budget,
-        //        Location = scholarshipInfo.Location,
-        //        SchoolName = scholarshipInfo.SchoolName,
-        //        Level = scholarshipInfo.Level,
-        //        Url = scholarshipInfo.Url,
-        //        IsApproved = false,
-        //        IsInSite = scholarshipInfo.IsInSite,
-        //        ImageUrl = scholarshipInfo.ImageUrl,
-        //        Description = scholarshipInfo.Description,
-        //        CreatedAt = DateTime.UtcNow,
-        //        AuthorId = scholarshipInfo.AuthorId,
-        //        ScholarshipCategories = [],
-        //    };
-        //    _context.Scholarships.Add(scholarship);
+        public async Task PostScholarshipInfo(ScholarshipDto scholarshipInfo)
+        {
+            scholarshipInfo.Id = Guid.NewGuid().ToString();
+            scholarshipInfo.IsInSite = true;
+            var scholarship = new Scholarship
+            {
+                Id = scholarshipInfo.Id,
+                Title = scholarshipInfo.Title,
+                Budget = scholarshipInfo.Budget,
+                Location = scholarshipInfo.Location,
+                SchoolName = scholarshipInfo.SchoolName,
+                Level = scholarshipInfo.Level,
+                Url = scholarshipInfo.Url,
+                IsApproved = false,
+                IsInSite = scholarshipInfo.IsInSite,
+                ImageUrl = scholarshipInfo.ImageUrl,
+                Description = scholarshipInfo.Description,
+                CreatedAt = DateTime.UtcNow,
+                AuthorId = scholarshipInfo.AuthorId,
+                ScholarshipCategories = [],
+            };
+            _context.Scholarships.Add(scholarship);
 
-        //    await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-        //    return;
-        //}
+            return;
+        }
 
         //public async Task PutScholarshipInfo(string id, Models.Entities.Scholarship scholarshipInfo)
         //{

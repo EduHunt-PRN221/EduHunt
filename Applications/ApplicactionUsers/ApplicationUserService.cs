@@ -20,9 +20,9 @@ namespace Eduhunt.Applications.ApplicactionUsers
             ApplicationDbContext context,
             IHttpContextAccessor httpContextAccessor,
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager,
-            IMapper mapper) :
-                base(context, httpContextAccessor, mapper)
+            RoleManager<IdentityRole> roleManager
+            ) :
+                base(context, httpContextAccessor)
         {
             _userManager = userManager;
             _roleManager = roleManager;

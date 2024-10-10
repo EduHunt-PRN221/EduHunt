@@ -2,7 +2,7 @@
 {
     public class SurveyAnswerDto
     {
-        public string SurveyId { get; set; }
+        public required string SurveyId { get; set; }
         public string Title { get; set; } = default!;
         public string Description { get; set; } = default!;
         public DateTime CreateAt { get; set; }

@@ -4,11 +4,11 @@ namespace Eduhunt.Models.Entities
 {
     public partial class Survey : _Base
     {
-        public string Title { get; set; }
+        public string Title { get; set; } = default!;
 
-        public string Description { get; set; }
+        public string Description { get; set; } = default!;
 
-        public string UserId { get; set; }
+        public required string UserId { get; set; }
 
         public DateTime CreateAt { get; set; }
 

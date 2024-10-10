@@ -4,9 +4,9 @@ namespace Eduhunt.Models.Entities
 {
     public class UserScholarship : _Base
     {
-        public string ScholarshipId { get; set; }
+        public required string ScholarshipId { get; set; }
 
-        public string UserId { get; set; }
+        public required string UserId { get; set; }
 
     }
 }

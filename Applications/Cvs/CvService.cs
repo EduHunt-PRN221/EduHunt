@@ -9,12 +9,10 @@ namespace Eduhunt.Applications.Cvs
     {
         public CvService(
             ApplicationDbContext context,
-            IHttpContextAccessor httpContextAccessor,
-            IMapper mapper) :
+            IHttpContextAccessor httpContextAccessor) :
                 base(
                     context,
-                    httpContextAccessor,
-                    mapper)
+                    httpContextAccessor)
         {
         }
     }

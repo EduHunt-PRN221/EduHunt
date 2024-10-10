@@ -9,16 +9,13 @@ namespace Eduhunt.Infrastructures.Repositories
     {
         protected readonly ApplicationDbContext _context;
         protected readonly IHttpContextAccessor _httpContextAccessor;
-        protected readonly IMapper _mapper;
 
         public Repository(
             ApplicationDbContext context,
-            IHttpContextAccessor httpContextAccessor,
-            IMapper mapper)
+            IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
-            _mapper = mapper;
         }
 
         public virtual IQueryable<T> GetAll()
