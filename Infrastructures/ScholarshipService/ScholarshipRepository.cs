@@ -39,7 +39,7 @@ public class ScholarshipRepository : IScholarship
         {
             return new List<Scholarship>();
         }
-        var allScholarships = await _scholarshipService.GetScholarshipInfo();
+        var allScholarships = _scholarshipService.GetAll();
         var rankedScholarships = await RankScholarshipsWithChatGPT(userSurvey, allScholarships);
         int topN = 5;
         return rankedScholarships.Take(topN).ToList();
@@ -132,11 +132,6 @@ public class ScholarshipRepository : IScholarship
             return scholarships;
         }
     }
-
-
-
-
-
 
     public Task AddScholarship(ScholarshipInfoDto scholarship)
     {

@@ -9,7 +9,7 @@ namespace Eduhunt.Infrastructures.Repositories
     {
         protected readonly ApplicationDbContext _context;
         protected readonly IHttpContextAccessor _httpContextAccessor;
-        protected readonly IMapper _mapper
+        protected readonly IMapper _mapper;
 
         public Repository(
             ApplicationDbContext context,

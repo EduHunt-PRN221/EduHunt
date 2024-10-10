@@ -1,4 +1,6 @@
-﻿using Eduhunt.DTOs;
+﻿using AutoMapper;
+using Eduhunt.Data;
+using Eduhunt.DTOs;
 using Eduhunt.Infrastructures.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +9,17 @@ namespace Eduhunt.Applications.Scholarship
 {
     public class ScholarshipService : Repository<Models.Entities.Scholarship>
     {
+        public ScholarshipService(
+            ApplicationDbContext context,
+            IHttpContextAccessor httpContextAccessor,
+            IMapper mapper) :
+                base(
+                    context,
+                    httpContextAccessor,
+                    mapper)
+        {
+        }
+
         public async Task ApproveScholarship(Guid id, [FromBody] bool isApproved)
         {
             var scholarship = await _context.Scholarships.FindAsync(id);
@@ -27,20 +40,6 @@ namespace Eduhunt.Applications.Scholarship
             await _context.SaveChangesAsync();
 
             return;
-        }
-
-        public async Task DeleteScholarshipInfo(Guid id)
-        {
-            var scholarshipInfo = await _context.Scholarships.FindAsync(id);
-            if (scholarshipInfo == null)
-            {
-                return;
-            }
-
-            _context.Scholarships.Remove(scholarshipInfo);
-            await _context.SaveChangesAsync();
-
-            return ;
         }
 
         public async Task<IEnumerable<Models.Entities.Scholarship>> GetScholarshipInfo()
