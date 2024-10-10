@@ -1,7 +1,7 @@
 ﻿using Eduhunt.Models.Contracts;
 using System.ComponentModel.DataAnnotations;
 
-namespace EDUHUNT_BE.Models
+namespace Eduhunt.Models.Entities
 {
     public class Scholarship : _Base
     {

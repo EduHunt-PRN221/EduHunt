@@ -1,6 +1,6 @@
 ﻿using Eduhunt.Models.Contracts;
 
-namespace EDUHUNT_BE.Models
+namespace Eduhunt.Models.Entities
 {
     public class Category : _Base
     {

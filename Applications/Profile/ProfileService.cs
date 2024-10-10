@@ -1,4 +1,5 @@
-﻿using Eduhunt.Data;
+﻿using AutoMapper;
+using Eduhunt.Data;
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -6,15 +7,17 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace Eduhunt.Applications.ProfileService
 {
-    public class ProfileService : Repository<Profile>
+    public class ProfileService : Repository<Models.Entities.Profile>
     {
 
         public ProfileService(
             ApplicationDbContext context,
-            IHttpContextAccessor httpContextAccessor) :
+            IHttpContextAccessor httpContextAccessor,
+            IMapper mapper) :
                 base(
                     context,
-                    httpContextAccessor)
+                    httpContextAccessor,
+                    mapper)
         {
         }
 
@@ -26,7 +29,7 @@ namespace Eduhunt.Applications.ProfileService
         }
 
         //get profile by user id
-        public async Task<Profile?> GetProfileByUserIdAsync(string? userId)
+        public async Task<Models.Entities.Profile?> GetProfileByUserIdAsync(string? userId)
         {
             if (string.IsNullOrEmpty(userId))
             {
@@ -38,7 +41,7 @@ namespace Eduhunt.Applications.ProfileService
             return entity;
         }
 
-        public async Task<Profile?> GetProfileByUserEmailAsync(string? userEmail)
+        public async Task<Models.Entities.Profile?> GetProfileByUserEmailAsync(string? userEmail)
         {
             if (string.IsNullOrEmpty(userEmail))
             {
@@ -51,7 +54,7 @@ namespace Eduhunt.Applications.ProfileService
         }
 
         //get profile by user id
-        public async Task<Profile?> GetProfileByUserNameAndEmailAsync(string username, string email)
+        public async Task<Models.Entities.Profile?> GetProfileByUserNameAndEmailAsync(string username, string email)
         {
             if (string.IsNullOrEmpty(username) && string.IsNullOrEmpty(email))
             {

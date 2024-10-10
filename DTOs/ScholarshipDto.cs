@@ -1,19 +1,33 @@
-﻿namespace Eduhunt.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Eduhunt.DTOs
 {
     public class ScholarshipDto
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
-        public string Title { get; set; } = string.Empty;
+        [Required]
+        public string Budget { get; set; }
 
-        public string Budget { get; set; } = string.Empty;
+        [Required]
+        public string Title { get; set; }
 
-        public string Location { get; set; } = string.Empty;
+        [Required]
+        public string Location { get; set; }
 
-        public string School_name { get; set; } = string.Empty;
+        [Required]
+        public string SchoolName { get; set; }
 
-        public string Level { get; set; } = string.Empty;
+        [Required]
+        public string Level { get; set; }
+        public string Description { get; set; }
+        public string Url { get; set; }
+        public string ImageUrl { get; set; }
 
-        public string Url { get; set; } = string.Empty;
+#nullable enable
+        public string? AuthorId { get; set; }
+        public bool? IsInSite { get; set; } = false;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsApproved { get; set; } = false;
     }
 }

@@ -1,4 +1,5 @@
-﻿using Eduhunt.Data;
+﻿using AutoMapper;
+using Eduhunt.Data;
 using Eduhunt.Models.Contracts;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,13 +9,16 @@ namespace Eduhunt.Infrastructures.Repositories
     {
         protected readonly ApplicationDbContext _context;
         protected readonly IHttpContextAccessor _httpContextAccessor;
+        protected readonly IMapper _mapper
 
         public Repository(
             ApplicationDbContext context,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IMapper mapper)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
         }
 
         public virtual IQueryable<T> GetAll()

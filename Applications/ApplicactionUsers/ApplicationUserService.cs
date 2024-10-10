@@ -1,5 +1,6 @@
 ﻿using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
+using AutoMapper;
 using Eduhunt.Data;
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
@@ -19,8 +20,9 @@ namespace Eduhunt.Applications.ApplicactionUsers
             ApplicationDbContext context,
             IHttpContextAccessor httpContextAccessor,
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager) :
-                base(context, httpContextAccessor)
+            RoleManager<IdentityRole> roleManager,
+            IMapper mapper) :
+                base(context, httpContextAccessor, mapper)
         {
             _userManager = userManager;
             _roleManager = roleManager;

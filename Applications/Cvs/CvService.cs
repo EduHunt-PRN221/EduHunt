@@ -1,4 +1,5 @@
-﻿using Eduhunt.Data;
+﻿using AutoMapper;
+using Eduhunt.Data;
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
 
@@ -8,10 +9,12 @@ namespace Eduhunt.Applications.Cvs
     {
         public CvService(
             ApplicationDbContext context,
-            IHttpContextAccessor httpContextAccessor) :
+            IHttpContextAccessor httpContextAccessor,
+            IMapper mapper) :
                 base(
                     context,
-                    httpContextAccessor)
+                    httpContextAccessor,
+                    mapper)
         {
         }
     }
