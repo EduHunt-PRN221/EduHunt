@@ -1,10 +1,10 @@
 ﻿using Eduhunt.Models.Contracts;
 
-namespace EDUHUNT_BE.Models
+namespace Eduhunt.Models.Entities
 {
     public class Category : _Base
     {
-        public string? Name { get; set; }
+        public string Name { get; set; } = default!;
         public virtual ICollection<ScholarshipCategory> ScholarshipCategories { get; set; } = default!;
     }
 }

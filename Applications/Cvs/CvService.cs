@@ -1,4 +1,5 @@
-﻿using Eduhunt.Data;
+﻿using AutoMapper;
+using Eduhunt.Data;
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
 

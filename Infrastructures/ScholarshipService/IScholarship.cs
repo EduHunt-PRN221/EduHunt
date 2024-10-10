@@ -1,12 +1,12 @@
 ﻿using Eduhunt.DTOs;
-using EDUHUNT_BE.Models;
+using Eduhunt.Models.Entities;
 
 namespace Eduhunt.Infrastructures.Repositories
 {
     public interface IScholarship
     {
-        Task<List<ScholarshipDto>> GetScholarships();
-        Task AddScholarship(ScholarshipDto scholarship);
+        Task<List<ScholarshipInfoDto>> GetScholarships();
+        //Task AddScholarship(ScholarshipInfoDto scholarship);
         Task<List<Scholarship>> GetRecommendedScholarships(string userId);
     }
 }

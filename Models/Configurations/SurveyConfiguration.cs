@@ -1,0 +1,32 @@
+﻿using Eduhunt.Models.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Eduhunt.Models.Configurations
+{
+    public class SurveyConfiguration : _BaseConfiguration<Survey>
+    {
+        public override void Configure(EntityTypeBuilder<Survey> builder)
+        {
+            base.Configure(builder);
+
+            builder.HasKey(e => e.Id);
+            builder.ToTable("Survey");
+            builder.Property(e => e.Id)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("Id");
+            builder.Property(e => e.CreateAt)
+                .HasColumnType("datetime")
+                .HasColumnName("Create_at");
+            builder.Property(e => e.Description).HasColumnType("text");
+            builder.Property(e => e.Title)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            builder.Property(e => e.UserId).HasColumnName("UserID");
+            builder.HasOne<ApplicationUser>()
+              .WithOne()
+              .HasForeignKey<Survey>(d => d.UserId)
+              .OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+}
