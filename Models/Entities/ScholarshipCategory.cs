@@ -1,13 +1,15 @@
 ﻿using Eduhunt.Models.Contracts;
 
-namespace EDUHUNT_BE.Models
+namespace Eduhunt.Models.Entities
 {
     public class ScholarshipCategory : _Base
     {
-        public Guid ScholarshipId { get; set; }
+        public required string ScholarshipId { get; set; }
 
-        public int CategoryId { get; set; }
+        public required string CategoryId { get; set; }
 
-        public virtual Category? Category { get; set; }
+        public virtual Scholarship Scholarship { get; set; } = default!;
+
+        public virtual Category Category { get; set; } = default!;
     }
 }

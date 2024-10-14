@@ -1,4 +1,4 @@
-﻿using Eduhunt.Data;
+using Eduhunt.Data;
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
 

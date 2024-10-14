@@ -1,7 +1,10 @@
-﻿using Eduhunt.Data;
+﻿using Eduhunt.Applications.Scholarships;
+using Eduhunt.Applications.Surveys;
+using Eduhunt.Data;
 using Eduhunt.DTOs;
 using Eduhunt.Infrastructures.Repositories;
-using EDUHUNT_BE.Models;
+using Eduhunt.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using OpenAI.Chat;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -11,25 +14,37 @@ using System.Text;
 
 public class Url
 {
-    public string URL { get; set; }
+    public required string URL { get; set; }
     public int ParentPage { get; set; }
-    public string CssSelector { get; set; }
+    public required string CssSelector { get; set; }
 }
 
 public class ScholarshipRepository : IScholarship
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly string _apiKey;
+    private readonly SurveyService _surveyService;
+    private readonly ScholarshipService _scholarshipService;
 
-    public ScholarshipRepository(ApplicationDbContext dbContext, IConfiguration configuration)
+    public ScholarshipRepository(ApplicationDbContext dbContext, IConfiguration configuration, SurveyService surveyService, ScholarshipService scholarshipService)
     {
         _dbContext = dbContext;
-        _apiKey = configuration["ChatGPT:Key"];
+        _apiKey = configuration["ChatGPT:Key"] ?? "";
+        _surveyService = surveyService;
+        _scholarshipService = scholarshipService;
     }
 
     public async Task<List<Scholarship>> GetRecommendedScholarships(string userId)
     {
+        var userSurvey = await _surveyService.GetByUserId(userId);
+        if (userSurvey == null)
+        {
             return new List<Scholarship>();
+        }
+        var allScholarships = _scholarshipService.GetAll();
+        var rankedScholarships = await RankScholarshipsWithChatGPT(userSurvey, allScholarships);
+        int topN = 5;
+        return rankedScholarships.Take(topN).ToList();
     }
 
     private async Task<List<Scholarship>> RankScholarshipsWithChatGPT(SurveyDto userSurvey, IEnumerable<Scholarship> allScholarships)
@@ -99,7 +114,7 @@ public class ScholarshipRepository : IScholarship
             .ToList();
     }
 
-    public async Task<List<ScholarshipDto>> GetScholarships()
+    public async Task<List<ScholarshipInfoDto>> GetScholarships()
     {
         List<Url> scholarshipLinks = new List<Url>
         {
@@ -120,27 +135,148 @@ public class ScholarshipRepository : IScholarship
         }
     }
 
+    //public Task AddScholarship(ScholarshipInfoDto scholarship)
+    //{
+    //    // Implement logic to add scholarship to your data source (e.g., database)
+    //    // ...
 
+    //    // Return a completed task since there's no asynchronous operation
+    //    return Task.CompletedTask;
+    //}
 
+    //private List<ScholarshipInfoDto> ParseHtml(string html)
+    //{
+    //    // Implement logic to parse the HTML and extract scholarship information
+    //    // ...
 
+    //    // For illustration purposes, return an empty list
+    //    return new List<ScholarshipInfoDto>();
+    //}
 
-
-    public Task AddScholarship(ScholarshipDto scholarship)
+    private async Task<ScholarshipInfoDto> UseOpenAIPrompt(string html, string url)
     {
-        // Implement logic to add scholarship to your data source (e.g., database)
-        // ...
+        bool isFailed = false;
+        while (true)
+        {
+            try
+            {
+                Console.WriteLine($"This is oke: {url}");
+                ScholarshipInfoDto newscholarship = new ScholarshipInfoDto();
+                string prompt = $"I'm a software developer. I need you to get the data from a scholarship page by reading the html code of the page: {html}." +
+                    " Please read those, get for me the budget, title, location, universityName, level, and categories of the scholarship in this page." +
+                    " Return it as a string follow the format: key: value; key: value,...; " +
+                    " the keys have to be: budget, title, location, universityName, level, categories. Categories should include specific fields or special identifiers that help recognize the scholarship." +
+                    " Not answer anything else so that I can easily manipulate the information.";
 
-        // Return a completed task since there's no asynchronous operation
-        return Task.CompletedTask;
+                /* var openAI = new OpenAIAPI("");
+                var chat = openAI.Chat.CreateConversation();
+                chat.Model = OpenAI_API.Models.Model.GPT4_Turbo;
+                chat.AppendUserInput(prompt);
+                string completions = await chat.GetResponseFromChatbotAsync();*/
+
+                ChatClient client = new(model: "gpt-4-1106-preview", new ApiKeyCredential(_apiKey));
+                ChatCompletion completion = client.CompleteChat(prompt);
+                string completions = completion.ToString();
+
+                Console.WriteLine("==========================this is GPT answer==========================");
+                Console.WriteLine(completions);
+
+                var budget = "";
+                var title = "";
+                var location = "";
+                var university = "";
+                var level = "";
+                var categories = new List<string>();
+
+                if (completions is not null)
+                {
+                    budget = Content(completions, "budget");
+                    title = Content(completions, "title");
+                    location = Content(completions, "location");
+                    university = Content(completions, "university");
+                    level = Content(completions, "level");
+                    categories = Content(completions, "categories").Split(',').Select(c => c.Trim()).ToList();
+
+                    Console.WriteLine("==========================this is Thanh answer==========================");
+                    Console.WriteLine(budget);
+                    Console.WriteLine(title);
+                    Console.WriteLine(location);
+                    Console.WriteLine(university);
+                    Console.WriteLine(level);
+                    Console.WriteLine(string.Join(", ", categories));
+                }
+
+                newscholarship = new ScholarshipInfoDto
+                {
+                    Title = title,
+                    Budget = budget,
+                    Location = location,
+                    School_name = university,
+                    Level = level,
+                    Url = url,
+                    Id = Guid.NewGuid().ToString(),
+                };
+
+                // Save the ScholarshipInfo to the database
+                var scholarshipInfo = new Scholarship
+                {
+                    Id = newscholarship.Id,
+                    Title = newscholarship.Title,
+                    Budget = newscholarship.Budget,
+                    Location = newscholarship.Location,
+                    SchoolName = newscholarship.School_name,
+                    Level = newscholarship.Level,
+                    Url = newscholarship.Url,
+                    AuthorId = null,
+                    IsInSite = false,
+                    IsApproved = true,
+                };
+
+                _dbContext.Scholarships.Add(scholarshipInfo);
+                await _dbContext.SaveChangesAsync();
+
+                // Save categories to the database
+                await SaveCategoriesToDatabase(categories, newscholarship.Id);
+
+                return newscholarship;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in UseOpenAIPromrt: {url} - {ex.Message}");
+                if (isFailed) return new ScholarshipInfoDto();
+                await Task.Delay(60000);
+                isFailed = true;
+            }
+        }
     }
 
-    private List<ScholarshipDto> ParseHtml(string html)
+    private async Task SaveCategoriesToDatabase(List<string> categories, string scholarshipId)
     {
-        // Implement logic to parse the HTML and extract scholarship information
-        // ...
+        // Check if the ScholarshipId exists in the ScholarshipInfos table
+        var scholarshipExists = await _dbContext.Scholarships.AnyAsync(s => s.Id == scholarshipId);
+        if (!scholarshipExists)
+        {
+            throw new Exception("ScholarshipId does not exist in the Scholarships table.");
+        }
 
-        // For illustration purposes, return an empty list
-        return new List<ScholarshipDto>();
+        foreach (var categoryName in categories)
+        {
+            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name == categoryName);
+            if (category == null)
+            {
+                category = new Category { Name = categoryName };
+                _dbContext.Categories.Add(category);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            var scholarshipCategory = new ScholarshipCategory
+            {
+                ScholarshipId = scholarshipId,
+                CategoryId = category.Id
+            };
+            _dbContext.ScholarshipCategories.Add(scholarshipCategory);
+        }
+        await _dbContext.SaveChangesAsync();
     }
 
     private void SearchGoogle(ChromeDriver driver)
@@ -162,13 +298,13 @@ public class ScholarshipRepository : IScholarship
         }
     }
 
-    private async Task<List<ScholarshipDto>> Scrapingdata(ChromeDriver driver, List<Url> scholarshipLinks)
+    private async Task<List<ScholarshipInfoDto>> Scrapingdata(ChromeDriver driver, List<Url> scholarshipLinks)
     {
         var chromeOptions = new ChromeOptions();
         chromeOptions.AddArgument("--ignore-certificate-errors-spki-list");
         chromeOptions.AddArgument("--ignore-certificate-errors");
 
-        List<ScholarshipDto> scholarships = new List<ScholarshipDto>();
+        List<ScholarshipInfoDto> scholarships = new List<ScholarshipInfoDto>();
         try
         {
             List<string> scholarshipDivs = new List<string>();
@@ -190,7 +326,7 @@ public class ScholarshipRepository : IScholarship
         catch (Exception ex)
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
-            return new List<ScholarshipDto>();
+            return new List<ScholarshipInfoDto>();
         }
         finally
         {
@@ -208,9 +344,9 @@ public class ScholarshipRepository : IScholarship
         return completions.Substring(mainIndex, length);
     }
 
-    private async Task<List<ScholarshipDto>> ScrapingProcessedData(ChromeDriver driver, List<string> scholarshipDivs, string css)
+    private async Task<List<ScholarshipInfoDto>> ScrapingProcessedData(ChromeDriver driver, List<string> scholarshipDivs, string css)
     {
-        List<ScholarshipDto> scholarships = new List<ScholarshipDto>();
+        List<ScholarshipInfoDto> scholarships = new List<ScholarshipInfoDto>();
         var count = 0;
         foreach (var scholarshipDiv in scholarshipDivs)
         {
