@@ -5,7 +5,7 @@ namespace Eduhunt.Models.Entities
 {
     public class ApplicationUser : IdentityUser, IHasId, IHasSoftDelete
     {
-        public string Name { get; set; } = default!;
+        public string? Name { get; set; }
         public bool IsNotDeleted { get; set; } = true;
         public bool IsVIP { get; set; } = false;
     }
