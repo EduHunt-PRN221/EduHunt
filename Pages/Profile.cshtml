@@ -3,6 +3,11 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @inject Microsoft.AspNetCore.Identity.UserManager<Eduhunt.Models.Entities.ApplicationUser> UserManager
 
+<style>
+    .img-thumbnail {
+        height: inherit;
+    }
+</style>
 <form hidden asp-page-handler="payVIP" method="post" id="formPay">
     <button type="submit">Pay</button>
 </form>
@@ -12,24 +17,25 @@
             <partial name="_Sidebar" />
             <!-- Main Content -->
             <div class="col-md-9 p-4">
-                <h1 class="mb-4">Profile</h1>
+                <h2 class="mb-4">Profile</h2>
                 <form method="post" enctype="multipart/form-data">
-                    <div class="d-flex flex-column align-items-start mb-4">
-                        <div class="border p-2">
+                    <div class="d-flex flex-row align-items-center justify-content-center mb-4">
+                        <div class="border p-2 align-items-center justify-content-center " style="width: 200px">
                             <div class="position-relative mb-3 bg-white rounded"
-                                 style="width: 200px; height: 200px; display: flex; justify-content: center; align-items: center;">
-                                <img id="selectedImage" alt="Profile picture" class="img-thumbnail" height="200"
-                                     src="@(Model.Profile?.AvatarImage ?? "/images/default-avatar.png")" width="200" style="object-fit: cover;" />
+                                 style="width: 160px; height: 160px; display: flex; justify-content: center; align-items: center; margin-left: 12px; margin-top: 4px">
+                                <img id="selectedImage" alt="Profile picture" class="img-thumbnail d-flex justify-content-center" height="160"
+                                     src="@(Model.Profile?.AvatarImage ?? "/images/default-avatar.png")" width="160" style="object-fit: fill;" />
 
                                 <label for="uploadAvatar" class="position-absolute w-100 bg-dark text-white text-center py-1" style="opacity: 0.7; cursor: pointer; bottom: 0;">
                                     <input id="uploadAvatar" asp-for="UploadAvatar" type="file" class="form-control d-none" accept="image/*" onchange="displaySelectedImage(event, 'selectedImage')" />
                                     Upload Photo
                                 </label>
                             </div>
-                            <div class="text-muted small text-center" style="width: 200px;">
+                            <div class="text-muted small text-center" style="width: auto;">
                                 Image size should be under 1MB and image ratio needs to be 1:1
                             </div>
                         </div>
+
                     </div>
                     @if (Model.IsMentor)
                     {
