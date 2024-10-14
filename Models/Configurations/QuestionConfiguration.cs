@@ -1,5 +1,4 @@
-﻿
-using Eduhunt.Models.Entities;
+﻿using Eduhunt.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

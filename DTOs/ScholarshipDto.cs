@@ -20,11 +20,10 @@ namespace Eduhunt.DTOs
 
         [Required]
         public string Level { get; set; } = default!;
+
         public string Description { get; set; } = default!;
         public string Url { get; set; } = default!;
         public string ImageUrl { get; set; } = default!;
-
-#nullable enable
         public string? AuthorId { get; set; }
         public bool IsInSite { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

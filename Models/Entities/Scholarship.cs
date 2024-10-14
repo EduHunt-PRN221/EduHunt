@@ -26,7 +26,6 @@ namespace Eduhunt.Models.Entities
 
         public string ImageUrl { get; set; } = default!;
 
-        #nullable enable
         public string AuthorId { get; set; } = default!;
 
         public bool IsInSite { get; set; } = false;

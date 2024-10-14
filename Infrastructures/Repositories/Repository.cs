@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Eduhunt.Data;
+﻿using Eduhunt.Data;
 using Eduhunt.Models.Contracts;
 using Microsoft.EntityFrameworkCore;
 

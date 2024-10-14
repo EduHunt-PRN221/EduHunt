@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Eduhunt.Data;
+﻿using Eduhunt.Data;
 using Eduhunt.DTOs;
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
@@ -98,7 +97,7 @@ namespace Eduhunt.Applications.Scholarships
                 ImageUrl = scholarshipInfo.ImageUrl,
                 Description = scholarshipInfo.Description,
                 CreatedAt = DateTime.UtcNow,
-                AuthorId = scholarshipInfo.AuthorId,
+                AuthorId = scholarshipInfo.AuthorId!,
                 ScholarshipCategories = [],
             };
             _context.Scholarships.Add(scholarship);

@@ -1,10 +1,6 @@
-﻿using Amazon.CognitoIdentityProvider;
-using Amazon.CognitoIdentityProvider.Model;
-using AutoMapper;
-using Eduhunt.Data;
+﻿using Eduhunt.Data;
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -20,8 +16,7 @@ namespace Eduhunt.Applications.ApplicactionUsers
             ApplicationDbContext context,
             IHttpContextAccessor httpContextAccessor,
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager
-            ) :
+            RoleManager<IdentityRole> roleManager) :
                 base(context, httpContextAccessor)
         {
             _userManager = userManager;

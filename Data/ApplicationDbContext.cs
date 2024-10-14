@@ -15,13 +15,13 @@ namespace Eduhunt.Data
         public DbSet<Cv> Cv { get; set; } = default!;
         public DbSet<ApplicationUser> ApplicationUsers { get; set; } = default!;
         public DbSet<Profile> Profile { get; set; } = default!;
-        public DbSet<Survey> Surveys { get; set; }
-        public DbSet<SurveyAnswer> SurveyAnswers { get; set; }
-        public DbSet<Answer> Answers { get; set; }
-        public DbSet<Scholarship> Scholarships { get; set; }
-        public DbSet<UserScholarship> UserScholarships { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<ScholarshipCategory> ScholarshipCategories { get; set; }
+        public DbSet<Survey> Surveys { get; set; } = default!;
+        public DbSet<SurveyAnswer> SurveyAnswers { get; set; } = default!;
+        public DbSet<Answer> Answers { get; set; } = default!;
+        public DbSet<Scholarship> Scholarships { get; set; } = default!;
+        public DbSet<UserScholarship> UserScholarships { get; set; } = default!;
+        public DbSet<Category> Categories { get; set; } = default!;
+        public DbSet<ScholarshipCategory> ScholarshipCategories { get; set; } = default!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
