@@ -1,8 +1,6 @@
-﻿using Eduhunt.Applications.Scholarships;
-using Eduhunt.Applications.Surveys;
+﻿using Eduhunt.Applications.Surveys;
 using Eduhunt.Data;
 using Eduhunt.DTOs;
-using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using OpenAI.Chat;
@@ -19,14 +17,14 @@ public class Url
     public required string CssSelector { get; set; }
 }
 
-public class ScholarshipRepository : IScholarship
+public class OpenAIService
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly string _apiKey;
     private readonly SurveyService _surveyService;
-    private readonly ScholarshipService _scholarshipService;
+    private readonly Eduhunt.Applications.Scholarships.ScholarshipService _scholarshipService;
 
-    public ScholarshipRepository(ApplicationDbContext dbContext, IConfiguration configuration, SurveyService surveyService, ScholarshipService scholarshipService)
+    public OpenAIService(ApplicationDbContext dbContext, IConfiguration configuration, SurveyService surveyService, Eduhunt.Applications.Scholarships.ScholarshipService scholarshipService)
     {
         _dbContext = dbContext;
         _apiKey = configuration["ChatGPT:Key"] ?? "";

@@ -8,8 +8,8 @@ namespace Eduhunt.Models.Entities
 
         public required string CategoryId { get; set; }
 
-        public virtual Scholarship Scholarship { get; set; } = default!;
+        public virtual Scholarship? Scholarship { get; set; }
 
-        public virtual Category Category { get; set; } = default!;
+        public virtual Category? Category { get; set; }
     }
 }
