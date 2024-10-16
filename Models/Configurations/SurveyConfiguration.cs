@@ -16,7 +16,7 @@ namespace Eduhunt.Models.Configurations
                 .ValueGeneratedOnAdd()
                 .HasColumnName("Id");
             builder.Property(e => e.CreateAt)
-                .HasColumnType("datetime")
+                .HasColumnType("timestamp")
                 .HasColumnName("Create_at");
             builder.Property(e => e.Description).HasColumnType("text");
             builder.Property(e => e.Title)

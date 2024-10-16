@@ -50,6 +50,8 @@ builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<C
 builder.Services.AddTransient<CloudinaryService>();
 // Call your extension method here to register custom services
 builder.Services.AddAllCustomServices();
+builder.Services.AddAutoMapper(typeof(Program));
+
 
 var app = builder.Build();
 

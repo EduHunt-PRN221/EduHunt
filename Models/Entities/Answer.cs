@@ -6,11 +6,11 @@ namespace Eduhunt.Models.Entities
     {
         public required string QuestionId { get; set; }
 
-        public string AnswerText { get; set; } = default!;
+        public string? AnswerText { get; set; }
 
-        public virtual Question Question { get; set; } = default!;
+        public virtual Question? Question { get; set; }
 
-        public virtual ICollection<SurveyAnswer> SurveyAnswers { get; set; } = default!;
+        public virtual ICollection<SurveyAnswer>? SurveyAnswers { get; set; }
 
         internal object Select(Func<object, Answer> value)
         {

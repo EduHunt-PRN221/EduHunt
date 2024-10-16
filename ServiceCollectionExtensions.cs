@@ -3,6 +3,8 @@ using Eduhunt.Applications.ApplicactionUsers;
 using Eduhunt.Applications.Cvs;
 using Eduhunt.Applications.Payment;
 using Eduhunt.Applications.ProfileService;
+using Eduhunt.Applications.Scholarships;
+using Eduhunt.Applications.Surveys;
 
 namespace Eduhunt
 {
@@ -15,7 +17,9 @@ namespace Eduhunt
             services.AddScoped<ApplicationUserService>();
             services.AddScoped<ProfileService>();
             services.AddScoped<PaymentService>();
-
+            services.AddScoped<SurveyService>();
+            services.AddScoped<ScholarshipService>();
+            services.AddScoped<OpenAIService>();
             return services;
         }
     }
