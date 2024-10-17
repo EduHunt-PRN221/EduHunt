@@ -6,6 +6,7 @@ using Eduhunt.Applications.ProfileService;
 using Eduhunt.Applications.Scholarships;
 using Eduhunt.Applications.Surveys;
 
+
 namespace Eduhunt
 {
     public static class ServiceCollectionExtensions
@@ -20,6 +21,7 @@ namespace Eduhunt
             services.AddScoped<SurveyService>();
             services.AddScoped<ScholarshipService>();
             services.AddScoped<OpenAIService>();
+
             return services;
         }
     }
