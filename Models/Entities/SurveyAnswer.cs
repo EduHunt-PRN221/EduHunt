@@ -9,8 +9,8 @@ namespace Eduhunt.Models.Entities
 
         public required string AnswerId { get; set; }
 
-        public virtual Answer Answer { get; set; } = default!;
+        public virtual Answer? Answer { get; set; }
 
-        public virtual Survey Survey { get; set; } = default!;
+        public virtual Survey? Survey { get; set; }
     }
 }
