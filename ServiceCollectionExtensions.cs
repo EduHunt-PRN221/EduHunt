@@ -3,6 +3,7 @@ using Eduhunt.Applications.ApplicactionUsers;
 using Eduhunt.Applications.Cvs;
 using Eduhunt.Applications.Payment;
 using Eduhunt.Applications.ProfileService;
+using Eduhunt.Applications.Scholarships;
 
 namespace Eduhunt
 {
@@ -15,6 +16,7 @@ namespace Eduhunt
             services.AddScoped<ApplicationUserService>();
             services.AddScoped<ProfileService>();
             services.AddScoped<PaymentService>();
+            services.AddScoped<ScholarshipService>();
 
             return services;
         }

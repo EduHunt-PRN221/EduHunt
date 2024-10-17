@@ -48,6 +48,7 @@ namespace Eduhunt.Pages
                 await _userService.UpdateVIPStatusByEmailAsync(userEmail, true);
 
             await LoadUserProfile(userEmail);
+            TempData["success"] = "Paid VIP successfully";
             return Page();
         }
 
@@ -68,6 +69,7 @@ namespace Eduhunt.Pages
             UpdateProfileProperties(profileDb);
 
             await _profileService.UpdateAsync(profileDb);
+            TempData["success"] = "Profile Updated successfully.";
             return RedirectToPage("/Profile");
         }
 

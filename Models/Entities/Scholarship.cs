@@ -1,4 +1,5 @@
 ﻿using Eduhunt.Models.Contracts;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace Eduhunt.Models.Entities
@@ -23,9 +24,9 @@ namespace Eduhunt.Models.Entities
         public string Description { get; set; } = default!;
 
         public string Url { get; set; } = default!;
-
+        [ValidateNever]
         public string ImageUrl { get; set; } = default!;
-
+        [ValidateNever]
         public string AuthorId { get; set; } = default!;
 
         public bool IsInSite { get; set; } = false;
@@ -33,7 +34,7 @@ namespace Eduhunt.Models.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public bool IsApproved { get; set; } = false;
-
+        [ValidateNever]
         public virtual ICollection<ScholarshipCategory> ScholarshipCategories { get; set; } = default!;
 
     }
