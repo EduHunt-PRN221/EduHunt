@@ -2,7 +2,6 @@ using Eduhunt;
 using Eduhunt.AppSettings;
 using Eduhunt.Data;
 using Eduhunt.Infrastructures.Cloud;
-using Eduhunt.Infrastructures.Middleware;
 using Eduhunt.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

@@ -257,6 +257,39 @@ namespace Eduhunt.Migrations
                     b.ToTable("Question", (string)null);
                 });
 
+            modelBuilder.Entity("Eduhunt.Models.Entities.Roadmap", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsNotDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("Roadmaps");
+                });
+
             modelBuilder.Entity("Eduhunt.Models.Entities.Scholarship", b =>
                 {
                     b.Property<string>("Id")
@@ -590,6 +623,15 @@ namespace Eduhunt.Migrations
                         .WithOne()
                         .HasForeignKey("Eduhunt.Models.Entities.Profile", "ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("Eduhunt.Models.Entities.Roadmap", b =>
+                {
+                    b.HasOne("Eduhunt.Models.Entities.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
 
                     b.Navigation("ApplicationUser");
                 });

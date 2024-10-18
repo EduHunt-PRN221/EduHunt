@@ -22,6 +22,7 @@ namespace Eduhunt.Data
         public DbSet<UserScholarship> UserScholarships { get; set; } = default!;
         public DbSet<Category> Categories { get; set; } = default!;
         public DbSet<ScholarshipCategory> ScholarshipCategories { get; set; } = default!;
+        public DbSet<Roadmap> Roadmaps { get; set; } = default!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -36,6 +37,7 @@ namespace Eduhunt.Data
             builder.ApplyConfiguration(new SurveyAnswerConfiguration());
             builder.ApplyConfiguration(new SurveyConfiguration());
             builder.ApplyConfiguration(new UserScholarshipConfiguration());
+            builder.ApplyConfiguration(new RoadmapConfiguration());
         }
     }
 }
