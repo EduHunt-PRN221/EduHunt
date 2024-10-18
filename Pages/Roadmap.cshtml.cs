@@ -59,7 +59,14 @@ namespace Eduhunt.Pages
                     .Where(x => x.ApplicationUserId == userId && x.IsNotDeleted)
                     .ToListAsync();
 
-                CanAddStep = true;
+                if(Roadmaps.Count == 0)
+                {
+                    CanAddStep = true;
+                }
+                else
+                {
+                    CanAddStep = false;
+                }
             }
             else
             {
