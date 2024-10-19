@@ -214,6 +214,64 @@
     </div>
 </div>
 <!--end grid card section-->
+
+<!--survey modal-->
+@if (Model.isModalOpen)
+{
+    <div id="modal" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background-color: rgba(0, 0, 0, 0.5); z-index: 105 0">
+        <div class="bg-white p-5 rounded-4 shadow-lg" style="max-width: 1000px; width: 100%;">
+            <button type="button" onclick="closeModal()" class="btn-close end-0"></button>
+            <h1 class="display-6 fw-bold text-dark mb-2 text-center">Survey</h1>
+            <hr class="w-100 border-0" style="height: 1px; background-color: black; margin-bottom: 1.5rem;" />
+            <form method="post">
+                <div class="container">
+                    <div class="row">
+                        @{
+                            var index = 0;
+                        }
+                        @foreach (Question question in Model.AllQuestions)
+                        {
+                            @if (question.Answers != null)
+                            {
+                                <div key=@question.Id class="col-md-6 mb-4">
+                                    <label class="form-label">
+                                        @(index + 1). @question.Content
+                                    </label>
+                                    <div class="form-group">
+                                        @foreach (Answer option in question.Answers)
+                                        {
+                                            <div class="form-check">
+                                                <input type="radio"
+                                                       name="Answers[@index]"
+                                                       value=@option.Id
+                                                       class="form-check-input" />
+                                                <label key=@option.Id class="form-check-label">
+                                                    @option.AnswerText
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                index++;
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+<!--end survey modal-->
+
+<script>
+    function closeModal() {
+        document.getElementById("modal").style.visibility = "hidden";
+    }
+</script>
+
 @section Scripts {
     <script>
         // Fetch country data from the API
@@ -272,4 +330,3 @@
         }
     </script>
 }
-

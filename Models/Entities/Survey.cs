@@ -14,6 +14,6 @@ namespace Eduhunt.Models.Entities
         [Column(TypeName = "timestamp")]
         public DateTime CreateAt { get; set; }
 
-        public virtual ICollection<SurveyAnswer>? SurveyAnswers { get; set; }
+        public virtual ICollection<SurveyAnswer> SurveyAnswers { get; set; } = default!;
     }
 }

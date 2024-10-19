@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Eduhunt.Data;
+﻿using Eduhunt.Data;
 using Eduhunt.DTOs;
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
@@ -9,18 +8,13 @@ namespace Eduhunt.Applications.Surveys
 {
     public class SurveyService : Repository<Survey>
     {
-
-        protected readonly IMapper _mapper;
-
         public SurveyService(
             ApplicationDbContext context,
-            IHttpContextAccessor httpContextAccessor,
-            IMapper mapper) :
+            IHttpContextAccessor httpContextAccessor) :
                 base(
                     context,
                     httpContextAccessor)
         {
-            _mapper = mapper;
         }
 
         public override async Task DeleteAsync(string? id)
@@ -51,23 +45,7 @@ namespace Eduhunt.Applications.Surveys
             }
         }
 
-        //public async Task<SurveyDto> GetSurveyById(string id)
-        //{
-        //    if (_context == null)
-        //    {
-        //        return null!;
-        //    }
-
-        //    var survey = await _context.Surveys.FirstOrDefaultAsync(s => s.Id == id);
-        //    if (survey == null)
-        //    {
-        //        return null!;
-        //    }
-
-        //    return _mapper.Map<SurveyDto>(survey);
-        //}
-
-        public async Task CreateSurvey(SurveyAnswerDto datasurvey)
+        public async Task AddSurvey(SurveyAnswerDto datasurvey)
         {
             if (_context == null)
             {
@@ -89,7 +67,12 @@ namespace Eduhunt.Applications.Surveys
                 }
 
                 datasurvey.CreateAt = DateTime.Now;
-                var new_survey = _mapper.Map<Survey>(datasurvey);
+                Survey new_survey = new Survey() { 
+                    UserId = datasurvey.UserId,
+                    Description = datasurvey.Description,
+                    CreateAt = datasurvey.CreateAt,
+                    Title = datasurvey.Title
+                };
 
                 _context.Surveys.Add(new_survey);
                 await _context.SaveChangesAsync();
