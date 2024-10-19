@@ -63,9 +63,26 @@
                         <input asp-for="Scholarship.Title" class="form-control" required />
                         <span asp-validation-for="Scholarship.Title" class="text-danger"></span>
                     </div>
+                    <div class="mb-3 d-flex">
+                        <div class="me-2 w-50">
+                            <label for="countrySelect" class="form-label fw-bold">Country</label>
+                            <select id="countrySelect" class="form-control" onchange="updateCities(); updateLocation();" required>
+                                <!-- Country options will be populated by JavaScript -->
+                                <option value="" disabled selected>Select a country</option>
+                            </select>
+                        </div>
+                        <div class="w-50">
+                            <label for="citySelect" class="form-label fw-bold">City</label>
+                            <select id="citySelect" class="form-control" onchange="updateLocation();" required disabled>
+                                <option value="" disabled selected>Select a country first</option>
+                                <!-- City options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label asp-for="Scholarship.Location" class="form-label fw-bold">Location</label>
-                        <input asp-for="Scholarship.Location" class="form-control" required />
+                        <input id="locationInput" asp-for="Scholarship.Location" class="form-control" required readonly />
                         <span asp-validation-for="Scholarship.Location" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
@@ -108,5 +125,76 @@
             };
             reader.readAsDataURL(input.files[0]);
         }
+
+        // Fetch country data and populate countries dropdown
+        fetch('https://countriesnow.space/api/v0.1/countries')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.error) {
+                    populateCountries(data.data); // Populate country select dropdown
+                } else {
+                    console.error('Error retrieving countries:', data.msg);
+                }
+            })
+            .catch(error => console.error('Fetch error:', error));
+
+        // Populate country select options
+        function populateCountries(countries) {
+            const countrySelect = document.getElementById("countrySelect");
+            countries.forEach(country => {
+                const option = document.createElement("option");
+                option.value = country.country; // Set country name as the value
+                option.text = country.country;
+                countrySelect.add(option);
+            });
+        }
+
+        // Update city select based on selected country
+        function updateCities() {
+            const countrySelect = document.getElementById("countrySelect");
+            const citySelect = document.getElementById("citySelect");
+
+            citySelect.innerHTML = ""; // Clear previous city options
+            citySelect.disabled = true; // Disable city select until cities are loaded
+
+            const selectedCountry = countrySelect.options[countrySelect.selectedIndex].text;
+
+            fetch('https://countriesnow.space/api/v0.1/countries/cities', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ country: selectedCountry })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.error) {
+                        data.data.forEach(city => {
+                            const option = document.createElement("option");
+                            option.value = city;
+                            option.text = city;
+                            citySelect.add(option);
+                        });
+                    } else {
+                        console.error('Error retrieving cities:', data.msg);
+                    }
+                    citySelect.disabled = false; // Enable city select after loading
+                    updateLocation(); // Update location value
+                })
+                .catch(error => console.error('Fetch error:', error));
+        }
+
+        // Update the location input field in "country, city" format
+        function updateLocation() {
+            const countrySelect = document.getElementById("countrySelect");
+            const citySelect = document.getElementById("citySelect");
+            const locationInput = document.getElementById("locationInput");
+
+            const selectedCountry = countrySelect.options[countrySelect.selectedIndex].text;
+            const selectedCity = citySelect.options[citySelect.selectedIndex]?.text || "";
+
+            if (selectedCountry && selectedCity) {
+                locationInput.value = `${selectedCountry}, ${selectedCity}`;
+            }
+        }
+
     </script>
 }
