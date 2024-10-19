@@ -18,6 +18,7 @@ namespace Eduhunt.Data
         public DbSet<Survey> Surveys { get; set; } = default!;
         public DbSet<SurveyAnswer> SurveyAnswers { get; set; } = default!;
         public DbSet<Answer> Answers { get; set; } = default!;
+        public DbSet<Question> Questions { get; set; } = default!;
         public DbSet<Scholarship> Scholarships { get; set; } = default!;
         public DbSet<UserScholarship> UserScholarships { get; set; } = default!;
         public DbSet<Category> Categories { get; set; } = default!;
