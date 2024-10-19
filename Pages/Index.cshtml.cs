@@ -28,7 +28,7 @@ namespace Eduhunt.Pages
             _userManager = userManager;
         }
 
-        public async Task OnGet()
+        public async Task OnGetAsync()
         {
             var scholarshipService = _serviceProvider.GetService<ScholarshipService>();
             var commonService = _serviceProvider.GetService<CommonService>();
