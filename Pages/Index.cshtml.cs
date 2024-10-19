@@ -28,7 +28,7 @@ namespace Eduhunt.Pages
             _userManager = userManager;
         }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(string SchoolName, string Country, string City, string Major, string Level, string Budget)
         {
             var scholarshipService = _serviceProvider.GetService<ScholarshipService>();
             var commonService = _serviceProvider.GetService<CommonService>();
@@ -47,6 +47,30 @@ namespace Eduhunt.Pages
                 {
                     isModalOpen = true;
                     AllQuestions = questionService.GetAllQuestionOption();
+                }
+                
+                //search
+                if (NewScholarships != null)
+                {
+                    if (!string.IsNullOrEmpty(SchoolName))
+                    {
+                        NewScholarships = NewScholarships.Where(x => x.SchoolName != null && x.SchoolName.ToLower().Contains(SchoolName.ToLower()));
+                    }
+
+                    if (!string.IsNullOrEmpty(Country) || !string.IsNullOrEmpty(City))
+                    {
+                        NewScholarships = NewScholarships.Where(x => x.Location != null && (x.Location.ToLower().Contains(Country.ToLower()) || x.Location.ToLower().Contains(City.ToLower())));
+                    }
+
+                    if (!string.IsNullOrEmpty(Level))
+                    {
+                        NewScholarships = NewScholarships.Where(x => x.Level != null && x.Level.Contains(Level.ToLower()));
+                    }
+
+                    if (!string.IsNullOrEmpty(Budget))
+                    {
+                        NewScholarships = NewScholarships.Where(x => x.Budget != null && x.Budget.Contains(Budget.ToLower()));
+                    }
                 }
             }
         }

@@ -35,6 +35,31 @@ namespace Eduhunt.Applications.ApplicactionUsers
             return roles;
         }
 
+        public async Task<List<ApplicationUser>> GetMentorsAsync()
+        {
+            var mentors = await _userManager.GetUsersInRoleAsync("Mentor");
+            return mentors.Where(u => u.IsNotDeleted).ToList();
+        }
+
+        public async Task<ApplicationUser?> GetUserByIdAsync(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return null;
+            }
+
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId && u.IsNotDeleted);
+        }
+
+        public string GetUserId (string email)
+        {
+            var userId = _context.Users
+            .Where(u => u.Email == email).Select(u => u.Id).SingleOrDefault();
+
+            return userId!;
+        }
+
         // Method to add a role to a user
         public async Task<bool> AddRoleForUserAsync(string userId, string roleName)
         {

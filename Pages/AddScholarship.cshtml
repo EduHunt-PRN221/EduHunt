@@ -1,0 +1,200 @@
+﻿@page
+@model AddScholarshipModel
+@{
+}
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .square-box {
+        width: 300px;
+        height: 300px;
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .square-box input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .square-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+</style>
+<div class="bg-white d-flex justify-content-center align-items-center m-lg-5">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">Create Post</h1>
+        <div class="row">
+            <div class="col-md-4 d-flex flex-column align-items-center justify-content-center p-4 square-box border-4 m-lg-5">
+                <i class="fas fa-image fa-4x text-muted mb-3"></i>
+                <p class="text-muted">Drop your image here or <a href="#" class="text-primary">browse</a></p>
+                <input type="file" accept="image/*" onchange="previewImage(event)">
+                <img id="imagePreview" alt="Image Preview">
+            </div>
+            <div class="col-md-8">
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label asp-for="Scholarship.Budget" class="form-label fw-bold">Budget</label>
+                        <input type="number" asp-for="Scholarship.Budget" class="form-control"
+                               required />
+                        <span asp-validation-for="Scholarship.Budget" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Scholarship.Level" class="form-label fw-bold">Level</label>
+                        <select asp-for="Scholarship.Level" class="form-select" id="level" required>
+                            <option selected value="undergraduate">Undergraduate</option>
+                            <option value="graduate">Graduate</option>
+                            <option value="phd">PhD</option>
+                        </select>
+                        <span asp-validation-for="Scholarship.Level" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Scholarship.Title" class="form-label fw-bold">Title</label>
+                        <input asp-for="Scholarship.Title" class="form-control" required />
+                        <span asp-validation-for="Scholarship.Title" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <div class="me-2 w-50">
+                            <label for="countrySelect" class="form-label fw-bold">Country</label>
+                            <select id="countrySelect" class="form-control" onchange="updateCities(); updateLocation();" required>
+                                <!-- Country options will be populated by JavaScript -->
+                                <option value="" disabled selected>Select a country</option>
+                            </select>
+                        </div>
+                        <div class="w-50">
+                            <label for="citySelect" class="form-label fw-bold">City</label>
+                            <select id="citySelect" class="form-control" onchange="updateLocation();" required disabled>
+                                <option value="" disabled selected>Select a country first</option>
+                                <!-- City options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Scholarship.Location" class="form-label fw-bold">Location</label>
+                        <input id="locationInput" asp-for="Scholarship.Location" class="form-control" required readonly />
+                        <span asp-validation-for="Scholarship.Location" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Scholarship.SchoolName" class="form-label fw-bold">School Name</label>
+                        <input asp-for="Scholarship.SchoolName" class="form-control"
+                               required />
+                        <span asp-validation-for="Scholarship.SchoolName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Scholarship.Url" class="form-label fw-bold">URL</label>
+                        <input asp-for="Scholarship.Url" class="form-control" />
+                        <span asp-validation-for="Scholarship.Url" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Scholarship.Description" class="form-label fw-bold">Description</label>
+                        <textarea asp-for="Scholarship.Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Scholarship.Description" class="text-danger"></span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <button type="submit" class="btn btn-primary w-25">Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const reader = new FileReader();
+            reader.onload = function () {
+                const dataURL = reader.result;
+                const imagePreview = document.getElementById('imagePreview');
+                imagePreview.src = dataURL;
+                imagePreview.style.display = 'block';
+                input.previousElementSibling.style.display = 'none';
+                input.previousElementSibling.previousElementSibling.style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        // Fetch country data and populate countries dropdown
+        fetch('https://countriesnow.space/api/v0.1/countries')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.error) {
+                    populateCountries(data.data); // Populate country select dropdown
+                } else {
+                    console.error('Error retrieving countries:', data.msg);
+                }
+            })
+            .catch(error => console.error('Fetch error:', error));
+
+        // Populate country select options
+        function populateCountries(countries) {
+            const countrySelect = document.getElementById("countrySelect");
+            countries.forEach(country => {
+                const option = document.createElement("option");
+                option.value = country.country; // Set country name as the value
+                option.text = country.country;
+                countrySelect.add(option);
+            });
+        }
+
+        // Update city select based on selected country
+        function updateCities() {
+            const countrySelect = document.getElementById("countrySelect");
+            const citySelect = document.getElementById("citySelect");
+
+            citySelect.innerHTML = ""; // Clear previous city options
+            citySelect.disabled = true; // Disable city select until cities are loaded
+
+            const selectedCountry = countrySelect.options[countrySelect.selectedIndex].text;
+
+            fetch('https://countriesnow.space/api/v0.1/countries/cities', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ country: selectedCountry })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.error) {
+                        data.data.forEach(city => {
+                            const option = document.createElement("option");
+                            option.value = city;
+                            option.text = city;
+                            citySelect.add(option);
+                        });
+                    } else {
+                        console.error('Error retrieving cities:', data.msg);
+                    }
+                    citySelect.disabled = false; // Enable city select after loading
+                    updateLocation(); // Update location value
+                })
+                .catch(error => console.error('Fetch error:', error));
+        }
+
+        // Update the location input field in "country, city" format
+        function updateLocation() {
+            const countrySelect = document.getElementById("countrySelect");
+            const citySelect = document.getElementById("citySelect");
+            const locationInput = document.getElementById("locationInput");
+
+            const selectedCountry = countrySelect.options[countrySelect.selectedIndex].text;
+            const selectedCity = citySelect.options[citySelect.selectedIndex]?.text || "";
+
+            if (selectedCountry && selectedCity) {
+                locationInput.value = `${selectedCountry}, ${selectedCity}`;
+            }
+        }
+
+    </script>
+}
