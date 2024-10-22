@@ -91,6 +91,7 @@ namespace Eduhunt.Areas.Identity.Pages
 
                     if (applicationUser != null)
                     {
+                        AddCookie("email", userEmail);
                         return LocalRedirect("/Index");
                     }
                     else

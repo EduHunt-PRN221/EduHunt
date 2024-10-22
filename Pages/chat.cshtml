@@ -1,0 +1,290 @@
+﻿@page
+@model Eduhunt.Pages.chatModel
+@{
+    Layout = null;
+    var convertedUserEmail = Model.ConvertedUserEmail; // Converted email from C#
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #chat-container {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            height: 80vh;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+
+        #user-list {
+            width: 30%;
+            border-right: 1px solid #ccc;
+            padding: 20px;
+            background-color: #f7f7f7;
+            overflow-y: auto;
+        }
+
+        #chat-box {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+
+        h3 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+
+        .user-item {
+            cursor: pointer;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #e9e9e9;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+            .user-item:hover {
+                background-color: #d1e7dd;
+                transform: scale(1.02);
+            }
+
+        #messages {
+            flex-grow: 1;
+            height: 0;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 12px 16px;
+            border-radius: 16px;
+            max-width: 75%;
+            word-wrap: break-word;
+            font-size: 16px;
+        }
+
+        .current-user {
+            align-self: flex-end;
+            background-color: #d1e7dd;
+        }
+
+        .other-user {
+            align-self: flex-start;
+            background-color: #f8d7da;
+        }
+
+        #messageInput {
+            flex-grow: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+        }
+
+            #messageInput:focus {
+                border-color: #6c757d;
+            }
+
+        #sendButton {
+            width: 100px;
+            padding: 12px;
+            margin-left: 10px;
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+            #sendButton:hover {
+                background-color: #0056b3;
+            }
+
+        #sendMessageContainer {
+            display: flex;
+            gap: 10px;
+        }
+
+        #messages::-webkit-scrollbar,
+        #user-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #messages::-webkit-scrollbar-thumb,
+        #user-list::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="user-list">
+            <h3>Users</h3>
+            <div id="users"></div>
+        </div>
+        <div id="chat-box">
+            <h3>Chat</h3>
+            <div id="messages"></div>
+            <div id="sendMessageContainer">
+                <input type="text" id="messageInput" placeholder="Type a message..." />
+                <button id="sendButton">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getDatabase, ref, onChildAdded, push, set } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "API_KEY_HERE",
+            authDomain: "test-6c526.firebaseapp.com",
+            databaseURL: "https://test-6c526-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "test-6c526",
+            storageBucket: "test-6c526.appspot.com",
+            messagingSenderId: "647478675126",
+            appId: "1:647478675126:web:811f4d5669c1d72e4e4817",
+            measurementId: "G-H6GSLEHGKK"
+        };
+
+        // Initialize Firebase app and database
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const currentUserEmail = "@convertedUserEmail";
+        const usersDiv = document.getElementById('users');
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        let selectedUser = null;
+
+        // AJAX call to fetch restored emails
+        // AJAX call to fetch restored emails
+        function loadUsersFromServer() {
+            $.ajax({
+                url: 'http://localhost:5090/chat?handler=RestoredEmails',
+                method: 'GET',
+                success: function (data) {
+                    usersDiv.innerHTML = '';
+                    data.forEach(email => {
+                        const userItem = document.createElement('div');
+                        userItem.textContent = email;
+                        userItem.className = 'user-item';
+                        userItem.onclick = () => loadMessages(email);
+                        usersDiv.appendChild(userItem);
+                    });
+                },
+                error: function (error) {
+                    console.error("Error fetching restored emails:", error);
+                }
+            });
+        }
+
+
+        function loadMessages(userEmail) {
+            selectedUser = userEmail;
+            messagesDiv.innerHTML = '';
+
+            const messagesRef = ref(database, `messages/${currentUserEmail}/${userEmail}`);
+            onChildAdded(messagesRef, snapshot => {
+                const message = snapshot.val();
+                displayMessage(message);
+            });
+        }
+
+        function displayMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message.text;
+            messageElement.className = 'message';
+
+            if (message.sender === currentUserEmail) {
+                messageElement.classList.add('current-user');
+            } else {
+                messageElement.classList.add('other-user');
+            }
+
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function sendMessage() {
+            if (!selectedUser) {
+                alert("Please select a user to chat with.");
+                return;
+            }
+
+            const messageText = messageInput.value;
+            const timestamp = new Date().toLocaleString();
+
+            if (messageText) {
+                const newMessageRef = push(ref(database, `messages/${currentUserEmail}/${selectedUser}`));
+                set(newMessageRef, {
+                    text: messageText,
+                    sender: currentUserEmail,
+                    timestamp: timestamp
+                }).catch(error => {
+                    console.error("Error sending message:", error);
+                });
+
+                const mirroredMessageRef = push(ref(database, `messages/${selectedUser}/${currentUserEmail}`));
+                set(mirroredMessageRef, {
+                    text: messageText,
+                    sender: currentUserEmail,
+                    timestamp: timestamp
+                }).catch(error => {
+                    console.error("Error mirroring message:", error);
+                });
+
+                messageInput.value = '';
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Load users on page load
+        loadUsersFromServer();
+    </script>
+
+</body>
+</html>
