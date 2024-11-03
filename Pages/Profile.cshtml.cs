@@ -45,10 +45,14 @@ namespace Eduhunt.Pages
                 return RedirectToPage("/Identity/Login");
 
             if (status == "PAID")
+            {
+
                 await _userService.UpdateVIPStatusByEmailAsync(userEmail, true);
+                TempData["success"] = "Paid VIP successfully";
+
+            }
 
             await LoadUserProfile(userEmail);
-            TempData["success"] = "Paid VIP successfully";
             return Page();
         }
 
