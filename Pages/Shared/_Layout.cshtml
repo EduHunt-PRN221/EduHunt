@@ -117,10 +117,23 @@
 
     <script>
         function signout() {
-            document.cookie = "AccessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-            document.cookie = "IdToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            document.cookie = "RefreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-            window.location.href = "/Identity/Login";
+            fetch('/Identity/Login?handler=Logout', {
+                method: 'GET',
+                credentials: 'same-origin'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/Identity/Login';
+                    } else {
+                        console.error('Logout failed. Status:', response.status);
+                        return response.text().then(text => {
+                            console.error('Response text:', text);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during logout:', error);
+                });
         }
     </script>
     <script src="https://cdn.syncfusion.com/ej2/20.2.43/dist/ej2.min.js"></script>
