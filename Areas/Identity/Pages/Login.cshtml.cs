@@ -63,7 +63,7 @@ namespace Eduhunt.Areas.Identity.Pages
             try
             {
                 var authResponse = await user.StartWithSrpAuthAsync(authRequest).ConfigureAwait(false);
-                var service =_serviceProvider.GetRequiredService<ProfileService>();
+                var service = _serviceProvider.GetRequiredService<ProfileService>();
 
                 if (authResponse.AuthenticationResult != null)
                 {
@@ -111,6 +111,21 @@ namespace Eduhunt.Areas.Identity.Pages
                 TempData["error"] = "An error occurred during login. Please try again.";
                 return Page();
             }
+        }
+
+        // Logout method
+        public IActionResult OnGetLogout()
+        {
+            void ClearCookie(string key)
+            {
+                HttpContext.Response.Cookies.Delete(key);
+            }
+            ClearCookie("IdToken");
+            ClearCookie("AccessToken");
+            ClearCookie("RefreshToken");
+            ClearCookie("email");
+
+            return LocalRedirect("/Identity/Login");
         }
     }
 }

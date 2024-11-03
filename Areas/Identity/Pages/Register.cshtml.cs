@@ -68,6 +68,7 @@ namespace Eduhunt.Areas.Identity.Pages
         public async Task<IActionResult> OnPostAsync()
         {
             var UserService = _serviceProvider.GetRequiredService<ApplicationUserService>();
+            RoleList = await UserService.GetAllRolesAsync();
             if (!ModelState.IsValid)
             {
                 return Page();
