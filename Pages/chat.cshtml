@@ -73,7 +73,7 @@
 
         #messages {
             flex-grow: 1;
-            height: 0;
+            height: 0; /* Ensures flex-grow works correctly */
             overflow-y: auto;
             border: 1px solid #ccc;
             padding: 10px;
@@ -137,6 +137,7 @@
             gap: 10px;
         }
 
+        /* Scrollbar styles */
         #messages::-webkit-scrollbar,
         #user-list::-webkit-scrollbar {
             width: 8px;
@@ -148,7 +149,6 @@
             border-radius: 4px;
         }
     </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
     <div id="chat-container">
@@ -168,11 +168,11 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-        import { getDatabase, ref, onChildAdded, push, set } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+        import { getDatabase, ref, onChildAdded, push, set, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
         // Firebase configuration
         const firebaseConfig = {
-            apiKey: "API_KEY_HERE",
+            apiKey: "AIzaSyDXaRAI4qQeCpX5K78-aDTAZVX0nUeHNwc",
             authDomain: "test-6c526.firebaseapp.com",
             databaseURL: "https://test-6c526-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "test-6c526",
@@ -187,35 +187,38 @@
         const database = getDatabase(app);
 
         const currentUserEmail = "@convertedUserEmail";
-        const usersDiv = document.getElementById('users');
+
         const messagesDiv = document.getElementById('messages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
+        const usersDiv = document.getElementById('users');
 
         let selectedUser = null;
 
-        // AJAX call to fetch restored emails
-        // AJAX call to fetch restored emails
-        function loadUsersFromServer() {
-            $.ajax({
-                url: 'http://localhost:5090/chat?handler=RestoredEmails',
-                method: 'GET',
-                success: function (data) {
-                    usersDiv.innerHTML = '';
-                    data.forEach(email => {
-                        const userItem = document.createElement('div');
-                        userItem.textContent = email;
-                        userItem.className = 'user-item';
-                        userItem.onclick = () => loadMessages(email);
-                        usersDiv.appendChild(userItem);
-                    });
-                },
-                error: function (error) {
-                    console.error("Error fetching restored emails:", error);
+        function loadUsersFromMessages() {
+            const messagesRef = ref(database, 'messages');
+            get(messagesRef).then(snapshot => {
+                if (snapshot.exists()) {
+                    const messagesData = snapshot.val();
+
+                    if (messagesData[currentUserEmail]) {
+                        const userMessages = messagesData[currentUserEmail];
+                        const userSet = Object.keys(userMessages);
+
+                        usersDiv.innerHTML = '';
+                        userSet.forEach(userEmail => {
+                            const userItem = document.createElement('div');
+                            userItem.textContent = userEmail;
+                            userItem.className = 'user-item';
+                            userItem.onclick = () => loadMessages(userEmail);
+                            usersDiv.appendChild(userItem);
+                        });
+                    }
                 }
+            }).catch(error => {
+                console.error("Error fetching messages from Firebase:", error);
             });
         }
-
 
         function loadMessages(userEmail) {
             selectedUser = userEmail;
@@ -230,7 +233,7 @@
 
         function displayMessage(message) {
             const messageElement = document.createElement('div');
-            messageElement.textContent = message.text;
+            messageElement.textContent = `${message.sender}: ${message.text}`;
             messageElement.className = 'message';
 
             if (message.sender === currentUserEmail) {
@@ -242,7 +245,7 @@
             messagesDiv.appendChild(messageElement);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
-
+      
         function sendMessage() {
             if (!selectedUser) {
                 alert("Please select a user to chat with.");
@@ -282,8 +285,7 @@
             }
         });
 
-        // Load users on page load
-        loadUsersFromServer();
+        loadUsersFromMessages();
     </script>
 
 </body>
