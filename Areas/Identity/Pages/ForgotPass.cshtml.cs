@@ -53,7 +53,7 @@ namespace Eduhunt.Areas.Identity.Pages
             {
                 if (_userManager.FindByEmailAsync(Email).Result == null)
                 {
-                    ModelState.AddModelError(string.Empty, "User not found.");
+                    TempData["error"] = "User not found.";
                     return Page();
                 }
 
@@ -71,13 +71,13 @@ namespace Eduhunt.Areas.Identity.Pages
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Failed to send reset instructions.");
+                    TempData["error"] = "Failed to send reset instructions.";
                     return Page();
                 }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["error"] = ex.Message;
                 return Page();
             }
         }

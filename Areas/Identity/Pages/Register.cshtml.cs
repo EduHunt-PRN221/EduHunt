@@ -104,7 +104,7 @@ namespace Eduhunt.Areas.Identity.Pages
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "User already exists and is confirmed.");
+                        TempData["error"] = "User already exists and is confirmed.";
                         return Page();
                     }
                 }
@@ -142,14 +142,14 @@ namespace Eduhunt.Areas.Identity.Pages
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Registration failed.");
+                    TempData["error"] = "Registration failed.";
                     return Page();
                 }
             }
             catch (Exception ex)
             {
                 // Handle errors (e.g., user already exists)
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["error"] =  ex.Message;
                 return Page();
             }
         }

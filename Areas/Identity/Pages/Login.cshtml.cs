@@ -96,19 +96,19 @@ namespace Eduhunt.Areas.Identity.Pages
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "User not found.");
+                        TempData["error"] = "User not found.";
                         return Page();
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Login failed.");
+                    TempData["error"] = "Login failed.";
                     return Page();
                 }
             }
             catch
             {
-                ModelState.AddModelError(string.Empty, "An error occurred during login. Please try again.");
+                TempData["error"] = "An error occurred during login. Please try again.";
                 return Page();
             }
         }

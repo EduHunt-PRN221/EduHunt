@@ -1,7 +1,7 @@
 ﻿@page
 @model Eduhunt.Pages.chatModel
 @{
-    var convertedUserEmail = Model.ConvertedUserEmail; // Converted email from C#
+    var convertedUserEmail = Model.ConvertedUserEmail;
 }
 
 <!DOCTYPE html>
@@ -148,7 +148,7 @@
     </style>
 </head>
 <body>
-    <div id="chat-container">
+    <div id="chat-container" class="my-5">
         <div id="user-list">
             <h3>Users</h3>
             <div id="users"></div>

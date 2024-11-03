@@ -84,7 +84,7 @@ namespace Eduhunt.Areas.Identity.Pages
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["error"] = ex.Message;
                 return Page();
             }
         }
@@ -93,7 +93,7 @@ namespace Eduhunt.Areas.Identity.Pages
         {
             if (string.IsNullOrEmpty(NewPassword))
             {
-                ModelState.AddModelError(nameof(NewPassword), "New password is required.");
+                TempData["error"] = "New password is required.";
                 return Page();
             }
 
@@ -115,18 +115,18 @@ namespace Eduhunt.Areas.Identity.Pages
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Password reset failed.");
+                    TempData["error"] = "Password reset failed.";
                     return Page();
                 }
             }
             catch (InvalidPasswordException)
             {
-                ModelState.AddModelError(nameof(NewPassword), "The password does not conform to policy.");
+                TempData["error"] = "The password does not conform to policy.";
                 return Page();
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["error"] = ex.Message;
                 return Page();
             }
         }
@@ -135,13 +135,13 @@ namespace Eduhunt.Areas.Identity.Pages
         {
             if (string.IsNullOrEmpty(Username))
             {
-                ModelState.AddModelError(nameof(Username), "Username is required for registration confirmation.");
+                TempData["error"] = "Username is required for registration confirmation.";
                 return Page();
             }
 
             if (string.IsNullOrEmpty(Role))
             {
-                ModelState.AddModelError(nameof(Role), "Role is required for registration confirmation.");
+                TempData["error"] = "Role is required for registration confirmation.";
                 return Page();
             }
 
@@ -170,18 +170,18 @@ namespace Eduhunt.Areas.Identity.Pages
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Confirmation failed.");
+                    TempData["error"] = "Confirmation failed.";
                     return Page();
                 }
             }
             catch (CodeMismatchException)
             {
-                ModelState.AddModelError(nameof(ConfirmationCode), "Invalid confirmation code.");
+                TempData["error"] = "Invalid confirmation code.";
                 return Page();
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["error"] = ex.Message;
                 return Page();
             }
         }

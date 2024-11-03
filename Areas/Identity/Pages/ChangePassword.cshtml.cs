@@ -50,7 +50,7 @@ namespace Eduhunt.Areas.Identity.Pages
             var accessToken = HttpContext.Request.Cookies["AccessToken"];
             if (string.IsNullOrEmpty(accessToken))
             {
-                ModelState.AddModelError(string.Empty, "User is not authenticated.");
+                TempData["error"] = "User is not authenticated.";
                 return Page();
             }
 
@@ -71,23 +71,23 @@ namespace Eduhunt.Areas.Identity.Pages
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Password change failed.");
+                    TempData["error"] = "Password change failed.";
                     return Page();
                 }
             }
             catch (InvalidPasswordException)
             {
-                ModelState.AddModelError(nameof(NewPassword), "The new password does not conform to the password policy.");
+                TempData["error"] = "The new password does not conform to the password policy.";
                 return Page();
             }
             catch (NotAuthorizedException)
             {
-                ModelState.AddModelError(nameof(OldPassword), "The current password is incorrect.");
+                TempData["error"] = "The current password is incorrect.";
                 return Page();
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                TempData["error"] = ex.Message;
                 return Page();
             }
         }
