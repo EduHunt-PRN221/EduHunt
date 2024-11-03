@@ -28,8 +28,9 @@ namespace Eduhunt.Pages
         public List<string> Answers { get; set; } = new List<string>();
 
         public bool IsMentor { get; set; }
+        public bool IsStudent { get; set; }
 
-        public IndexModel(IServiceProvider serviceProvider, UserManager<ApplicationUser> userManager, ProfileService profileService, 
+        public IndexModel(IServiceProvider serviceProvider, UserManager<ApplicationUser> userManager, ProfileService profileService,
             ApplicationUserService userService, IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
@@ -48,14 +49,12 @@ namespace Eduhunt.Pages
 
             var httpContext = _httpContextAccessor.HttpContext!;
             var idToken = httpContext.Request.Cookies["IdToken"];
-            if (string.IsNullOrEmpty(idToken))
+            if (!string.IsNullOrEmpty(idToken))
             {
-                LocalRedirect("/Identity/Login");
-                return;
+                var userEmail = _profileService.GetEmailFromToken(idToken);
+                IsMentor = await _userService.IsMentorAsync(userEmail);
+                IsStudent = await _userService.IsStudentAsync(userEmail);
             }
-
-            var userEmail = _profileService.GetEmailFromToken(idToken);
-            IsMentor = await _userService.IsMentorAsync(userEmail);
 
             if (scholarshipService != null && commonService != null && questionService != null && surveyService != null)
             {
@@ -65,8 +64,9 @@ namespace Eduhunt.Pages
 
                 string userID = await commonService.GetUserId();
 
-                //check user logged in
-                if (commonService.IsUserLoggedIn())
+                //check user logged in and is student
+
+                if (commonService.IsUserLoggedIn() && IsStudent)
                 {
                     TopScholarships = await scholarshipService.GetScholarshipByUserId(userID);
                     if (TopScholarships.Count() == 0 || TopScholarships == null)
