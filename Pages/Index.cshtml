@@ -176,7 +176,7 @@
 <!--grid card section-->
 <div class="container-fluid bg-light py-5">
     <div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center">
-        @for (int i = 0; i < 4; i++)
+        @for (int i = 0; i < Model.TopScholarships.Count(); i++)
         {
             Scholarship TopScholarShip = Model.TopScholarships.ElementAt(i);
             <div class="col col-md-5">
@@ -214,7 +214,6 @@
     </div>
 </div>
 <!--end grid card section-->
-
 <!--survey modal-->
 @if (Model.isModalOpen)
 {
