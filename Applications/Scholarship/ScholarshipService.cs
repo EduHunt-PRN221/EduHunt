@@ -107,6 +107,65 @@ namespace Eduhunt.Applications.Scholarships
             return;
         }
 
+        //get scholarship by userid
+        public async Task<IEnumerable<Scholarship>> GetScholarshipByUserId(string userId)
+        {
+            var questionIds = _context.Questions
+                .Where(q => q.IsNotDeleted)
+                .Select(q => q.Id)
+                .ToList();
+
+            //get list survey id by userid
+            var surveys = _context.Surveys
+                .Where(survey => survey.UserId == userId && survey.IsNotDeleted)
+                .Select(survey => survey.Id)
+                .ToList();
+            if (surveys.Count == 0)
+            {
+                //return top 4 scholarships
+                return await _context.Scholarships
+                    .Where(scholarship => scholarship.IsApproved && scholarship.IsInSite)
+                    .OrderBy(scholarship => scholarship.Budget)
+                    .Take(4)
+                    .ToListAsync();
+            }
+            //get survey answers by surveyid
+            var surveyAnswers = _context.SurveyAnswers
+                 .Where(surveyAnswer => surveys.Contains(surveyAnswer.SurveyId) && surveyAnswer.IsNotDeleted)
+                 .Select(surveyAnswer => new
+                 {
+                     surveyAnswer.SurveyId,
+                     surveyAnswer.AnswerId
+                 })
+                 .ToList();
+            //get answers by surveyanswers
+            var answers = _context.Answers
+                .Where(answer => surveyAnswers.Select(sa => sa.AnswerId).Contains(answer.Id)
+                                && questionIds.Contains(answer.QuestionId)
+                                && answer.IsNotDeleted)
+                .Select(answer => answer.AnswerText)
+                .ToList();
+
+            //get scholarship by answers
+            var lowerCaseAnswers = answers
+                .Select(a => a!.ToLower())
+                .ToList();
+
+
+            var scholarships = await _context.Scholarships
+                .Where(scholarship =>
+                    (scholarship.Level != null && lowerCaseAnswers.Contains(scholarship.Level.ToLower())
+                     || (scholarship.Budget != null && lowerCaseAnswers.Contains(scholarship.Budget.ToLower()))
+                     || (scholarship.Location != null && lowerCaseAnswers.Contains(scholarship.Location.ToLower()))
+                     || (scholarship.SchoolName != null && lowerCaseAnswers.Contains(scholarship.SchoolName.ToLower())))
+                     && scholarship.IsApproved
+                     && scholarship.IsInSite)
+                .ToListAsync();
+
+            return scholarships;
+
+        }
+
         //public async Task PutScholarshipInfo(string id, Models.Entities.Scholarship scholarshipInfo)
         //{
         //    if (id != scholarshipInfo.Id)

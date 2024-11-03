@@ -41,14 +41,28 @@ namespace Eduhunt.Pages
                 var allScholarship = scholarshipService.GetAll();
                 Random random = new Random();
                 NewScholarships = allScholarship.OrderByDescending(x => x.CreatedAt);
-                TopScholarships = allScholarship.ToList().OrderBy(x => x.Budget).Take(4);
+
                 string userID = await commonService.GetUserId();
+
+                //check user logged in
+                if (commonService.IsUserLoggedIn())
+                {
+                    TopScholarships = await scholarshipService.GetScholarshipByUserId(userID);
+                    if (TopScholarships.Count() == 0 || TopScholarships == null)
+                    {
+                        TopScholarships = allScholarship.ToList().OrderBy(x => x.Budget).Take(4);
+                    }
+                }
+                else
+                {
+                    TopScholarships = allScholarship.ToList().OrderBy(x => x.Budget).Take(4);
+                }
                 if (commonService.IsUserLoggedIn() && await surveyService.GetByUserId(userID) == null)
                 {
                     isModalOpen = true;
                     AllQuestions = questionService.GetAllQuestionOption();
                 }
-                
+
                 //search
                 if (NewScholarships != null)
                 {
@@ -93,11 +107,15 @@ namespace Eduhunt.Pages
                         UserId = userID,
                     };
                     await surveyService.AddSurvey(newSurveyAnswer);
-                } catch (Exception ex)
+                    TempData["Success"] = "Survey has been submitted successfully.";
+                }
+                catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.Message);
+                    TempData["Error"] = "Error when submit survey, try again!";
                 }
-            } else
+            }
+            else
             {
                 ModelState.AddModelError(string.Empty, "Error: Not full question answered.");
             }
