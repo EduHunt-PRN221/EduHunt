@@ -23,6 +23,7 @@ namespace Eduhunt.Pages
 
         public bool IsVIP { get; set; }
         public bool IsMentor { get; set; }
+        public bool IsStudent { get; set; }
 
         private readonly ProfileService _profileService;
         private readonly ApplicationUserService _userService;
@@ -109,6 +110,7 @@ namespace Eduhunt.Pages
             Profile = await _profileService.GetProfileByUserEmailAsync(userEmail) ?? new Profile();
             IsVIP = await _userService.GetVIPStatusByEmailAsync(userEmail);
             IsMentor = await _userService.IsMentorAsync(userEmail);
+            IsStudent = await _userService.IsStudentAsync(userEmail);
         }
 
         private async Task UpdateProfileImages(Profile profileDb)
