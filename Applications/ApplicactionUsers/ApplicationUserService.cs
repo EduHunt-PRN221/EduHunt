@@ -1,4 +1,5 @@
 ﻿using Eduhunt.Data;
+using Eduhunt.DTOs;
 using Eduhunt.Infrastructures.Repositories;
 using Eduhunt.Models.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -33,6 +34,12 @@ namespace Eduhunt.Applications.ApplicactionUsers
                 })
                 .ToListAsync();
             return roles;
+        }
+
+        public async Task<List<ApplicationUser>> GetAllUser()
+        {
+            List<ApplicationUser> Users = await _context.ApplicationUsers.ToListAsync();
+            return Users;
         }
 
         public async Task<List<ApplicationUser>> GetMentorsAsync()

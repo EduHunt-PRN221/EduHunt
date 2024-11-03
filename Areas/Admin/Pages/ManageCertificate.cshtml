@@ -1,0 +1,77 @@
+﻿@page
+@using Eduhunt.Models.Entities;
+@model Eduhunt.Areas.Admin.Pages.ManageCertificateModel
+@{
+}
+
+<form hidden asp-page-handler="payVIP" method="post" id="formPay">
+    <button type="submit">Pay</button>
+</form>
+
+<div class="container mt-5">
+    <h4>Manage Certificates</h4>
+    <div class="table-responsive">
+        <table class="table border">
+            <thead class="bg-dark border">
+                <tr>
+                    <th class="border">Image</th>
+                    <th class="border">User Name</th>
+                    <th class="border">State</th>
+                    <th class="border-bottom">Action</th>
+                </tr>
+            </thead>
+            <tbody class="">
+                @if (Model.UserProfile.Count == 0)
+                {
+                    <tr>
+                        <td colspan="3" class="text-center mt-5">
+                            <img src="https://img.icons8.com/ios/50/000000/open-box--v1.png" alt="No Data">
+                            <p class="mt-2">No data</p>
+                        </td>
+                        <td></td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        @foreach (Profile item in Model.UserProfile)
+                        {
+                            <td class="border" style="width: 0"><img src="@item.CertificateImage" alt="No Data"></td>
+                            <td class="border">@item.UserName</td>
+                            <td class="border">@(item.IsApprove? "Approved" : "Not yet Approved")</td>
+                            <td class="border d-flex">
+                                @if(item.IsApprove == false)
+                                {
+                                    <div>
+                                        <form method="post">
+                                            <input type="hidden" name="UserId" id="UserId" value="@item.Id" />
+                                            <button class="btn btn-primary" type="submit">
+                                                Approve
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <form method="post" asp-page-handler="Deny">
+                                            <input type="hidden" name="UserId" id="UserId" value="@item.Id" />
+                                            <button class="btn btn-danger" type="submit">
+                                                Deny
+                                            </button>
+                                        </form>
+                                    </div>
+                                } else
+                                {
+                                    <form method="post" asp-page-handler="Deny">
+                                        <input type="hidden" name="UserId" id="UserId" value="@item.Id" />
+                                        <button class="btn btn-danger" type="submit">
+                                            Delete
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

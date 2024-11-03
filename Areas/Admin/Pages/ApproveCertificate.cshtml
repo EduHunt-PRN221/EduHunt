@@ -1,0 +1,50 @@
+﻿@page
+@using Eduhunt.Models.Entities;
+@model Eduhunt.Areas.Admin.ApproveCertificateModel
+@{
+}
+
+<div class="container mt-5">
+    <h4>Approve Certificates</h4>
+    <div class="table-responsive">
+        <table class="table border">
+            <thead class="bg-dark border">
+                <tr>
+                    <th class="border">Image</th>
+                    <th class="border">User Name</th>
+                    <th class="border-bottom">Action</th>
+                </tr>
+            </thead>
+            <tbody class="">
+                @if (Model.UserProfile.Count == 0)
+                {
+                    <tr>
+                        <td colspan="3" class="text-center mt-5">
+                            <img src="https://img.icons8.com/ios/50/000000/open-box--v1.png" alt="No Data">
+                            <p class="mt-2">No data</p>
+                        </td>
+                        <td></td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        @foreach (Profile item in Model.UserProfile)
+                        {
+                            <td  class="border" style="width: 0"><img src="@item.CertificateImage" alt="No Data"></td>
+                            <td  class="border">@item.UserName</td>
+                            <td  class="border">
+                                <form method="post">
+                                    <input type="hidden" name="UserId" id="UserId" value="@item.Id" />
+                                    <button class="btn btn-primary" type="submit">
+                                        Approve
+                                    </button>
+                                </form>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

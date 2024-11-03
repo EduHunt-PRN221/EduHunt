@@ -1,0 +1,52 @@
+﻿@page
+@model Eduhunt.Areas.Admin.Pages.IndexModel
+@using Eduhunt.DTOs;
+@{
+}
+
+<div class="container mt-5">
+    <h4>Approve Certificates</h4>
+    <div class="table-responsive">
+        <table class="table border">
+            <thead class="bg-dark border">
+                <tr>
+                    <th class="border">Name</th>
+                    <th class="border">Email</th>
+                    <th class="border">Role</th>
+                    <th class="border-bottom">Action</th>
+                </tr>
+            </thead>
+            <tbody class="">
+                @if (Model.UserProfile.Count == 0)
+                {
+                    <tr>
+                        <td colspan="3" class="text-center mt-5">
+                            <img src="https://img.icons8.com/ios/50/000000/open-box--v1.png" alt="No Data">
+                            <p class="mt-2">No data</p>
+                        </td>
+                        <td></td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (UserDto item in Model.UserProfile)
+                    {
+                        <tr>
+                            <td  class="border">@item.Name</td>
+                            <td class="border">@item.Email</td>
+                            <td class="border">@item.Role</td>
+                            <td  class="border">
+                                <form method="post">
+                                    <input type="hidden" name="UserId" id="UserId" value="@item.Id" />
+                                    <button class="btn btn-danger" type="submit">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
