@@ -92,6 +92,12 @@ namespace Eduhunt.Areas.Identity.Pages
                     if (applicationUser != null)
                     {
                         AddCookie("email", userEmail);
+                        var roleObj = await _userManager.GetRolesAsync(applicationUser);
+                        string role = roleObj.FirstOrDefault();
+                        if (role == "Admin")
+                        {
+                            return LocalRedirect("/Admin");
+                        }
                         return LocalRedirect("/Index");
                     }
                     else
