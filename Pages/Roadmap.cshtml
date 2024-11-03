@@ -69,7 +69,7 @@
     {
         <!-- Regular User View: List of Mentors and Selected Mentor's Roadmap -->
         <div class="row">
-            <div class="col-md-4 mb-4">
+            <div class="col-md-5 mb-4">
                 <div class="card shadow-sm">
                     <div class="card-header" style="background-color: #0D6EFD; color: white;">
                         <h5 class="mb-0">List of Mentors</h5>
@@ -96,7 +96,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-7">
                 @foreach (var mentor in Model.Mentors)
                 {
                     <div id="roadmap-@mentor.Id" class="roadmap-container" style="display: none;">

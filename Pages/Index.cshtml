@@ -215,7 +215,7 @@
 </div>
 <!--end grid card section-->
 <!--survey modal-->
-@if (Model.isModalOpen)
+@if (Model.isModalOpen && !Model.IsMentor)
 {
     <div id="modal" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background-color: rgba(0, 0, 0, 0.5); z-index: 105 0">
         <div class="bg-white p-5 rounded-4 shadow-lg" style="max-width: 1000px; width: 100%;">

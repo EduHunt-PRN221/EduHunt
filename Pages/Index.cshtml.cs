@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Eduhunt.Applications.Questions;
 using Eduhunt.Applications.Surveys;
 using Eduhunt.DTOs;
+using Eduhunt.Applications.ProfileService;
+using Eduhunt.Applications.ApplicactionUsers;
 
 namespace Eduhunt.Pages
 {
@@ -18,12 +20,21 @@ namespace Eduhunt.Pages
         public Survey Survey = default!;
         public bool isModalOpen = false;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ProfileService _profileService;
+        private readonly ApplicationUserService _userService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<ApplicationUser> _userManager;
         [BindProperty]
         public List<string> Answers { get; set; } = new List<string>();
 
-        public IndexModel(IServiceProvider serviceProvider, UserManager<ApplicationUser> userManager)
+        public bool IsMentor { get; set; }
+
+        public IndexModel(IServiceProvider serviceProvider, UserManager<ApplicationUser> userManager, ProfileService profileService, 
+            ApplicationUserService userService, IHttpContextAccessor httpContextAccessor)
         {
+            _userService = userService;
+            _httpContextAccessor = httpContextAccessor;
+            _profileService = profileService;
             _serviceProvider = serviceProvider;
             _userManager = userManager;
         }
@@ -35,6 +46,16 @@ namespace Eduhunt.Pages
             var questionService = _serviceProvider.GetService<QuestionService>();
             var surveyService = _serviceProvider.GetService<SurveyService>();
 
+            var httpContext = _httpContextAccessor.HttpContext!;
+            var idToken = httpContext.Request.Cookies["IdToken"];
+            if (string.IsNullOrEmpty(idToken))
+            {
+                LocalRedirect("/Identity/Login");
+                return;
+            }
+
+            var userEmail = _profileService.GetEmailFromToken(idToken);
+            IsMentor = await _userService.IsMentorAsync(userEmail);
 
             if (scholarshipService != null && commonService != null && questionService != null && surveyService != null)
             {
