@@ -14,7 +14,7 @@ namespace Eduhunt.Models.Entities
         public string? Title { get; set; } 
         public string? AvatarImage { get; set; }
         public string? CertificateImage { get; set; }
-
+        public bool IsApprove { get; set; } = false;
         public string? ApplicationUserId { get; set; }
         public virtual ApplicationUser? ApplicationUser { get; set; } = default!;
 
