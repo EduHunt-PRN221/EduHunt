@@ -1,7 +1,6 @@
 ﻿@page
 @model Eduhunt.Pages.chatModel
 @{
-    Layout = null;
     var convertedUserEmail = Model.ConvertedUserEmail; // Converted email from C#
 }
 
@@ -17,10 +16,6 @@
             background-color: #f0f2f5;
             margin: 0;
             padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
         }
 
         #chat-container {
@@ -33,7 +28,9 @@
             border-radius: 12px;
             overflow: hidden;
             background-color: #ffffff;
+            margin: auto;
         }
+
 
         #user-list {
             width: 30%;
