@@ -2,12 +2,14 @@ using Eduhunt.Applications.ApplicactionUsers;
 using Eduhunt.Applications.ProfileService;
 using Eduhunt.DTOs;
 using Eduhunt.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Eduhunt.Areas.Admin.Pages
 {
+    [Authorize(Roles = "Admin")]
     public class IndexModel : PageModel
     {
         public List<UserDto> UserProfile = new List<UserDto>();

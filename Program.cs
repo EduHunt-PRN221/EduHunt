@@ -3,6 +3,7 @@ using Eduhunt.AppSettings;
 using Eduhunt.Data;
 using Eduhunt.Infrastructures.Cloud;
 using Eduhunt.Models.Entities;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -43,6 +44,17 @@ builder.Services
     .AddRoles<IdentityRole>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddCookie("Cookies", options =>
+    {
+        options.LoginPath = "/Identity/Login";
+        options.AccessDeniedPath = "/Identity/AccessDenied";
+    });
+builder.Services.AddControllersWithViews();
 
 builder.Services.Configure<CloudinarySetting>(builder.Configuration.GetSection("CloudinarySetting"));
 builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<CloudinarySetting>>().Value);

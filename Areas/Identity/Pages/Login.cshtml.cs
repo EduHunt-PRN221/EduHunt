@@ -3,9 +3,12 @@ using Amazon.CognitoIdentityProvider;
 using Amazon.Extensions.CognitoAuthentication;
 using Eduhunt.Applications.ProfileService;
 using Eduhunt.Models.Entities;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
 
 namespace Eduhunt.Areas.Identity.Pages
 {
@@ -94,12 +97,23 @@ namespace Eduhunt.Areas.Identity.Pages
                         AddCookie("email", userEmail);
                         var roleObj = await _userManager.GetRolesAsync(applicationUser);
                         string role = roleObj.FirstOrDefault();
+
+                        var identity = new ClaimsIdentity(new[]
+                        {
+                            new Claim(ClaimTypes.Name, userEmail),
+                            new Claim(ClaimTypes.Role, role)
+                        }, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                        var principal = new ClaimsPrincipal(identity);
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
                         if (role == "Admin")
                         {
                             return LocalRedirect("/Admin");
                         }
                         return LocalRedirect("/Index");
                     }
+
                     else
                     {
                         TempData["error"] = "User not found.";
