@@ -36,14 +36,17 @@
                     <tr>
                         @foreach (Profile item in Model.UserProfile)
                         {
-                            <td class="border" style="width: 0"><img src="@item.CertificateImage" alt="No Data"></td>
+                            <td class="border" style="width: 0" >
+                                <img class="" 
+                                     src="@(item.CertificateImage ?? "/images/default-avatar.png")" width="300" style="object-fit: cover;" />
+                            </td>
                             <td class="border">@item.UserName</td>
                             <td class="border">@(item.IsApprove? "Approved" : "Not yet Approved")</td>
                             <td class="border d-flex">
                                 @if(item.IsApprove == false)
                                 {
                                     <div>
-                                        <form method="post">
+                                        <form method="post" class="me-2">
                                             <input type="hidden" name="UserId" id="UserId" value="@item.Id" />
                                             <button class="btn btn-primary" type="submit">
                                                 Approve
