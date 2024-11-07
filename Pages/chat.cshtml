@@ -1,5 +1,5 @@
 ﻿@page
-@model Eduhunt.Pages.chatModel
+@model Eduhunt.Pages.ChatModel
 @{
     var convertedUserEmail = Model.ConvertedUserEmail;
 }
@@ -205,7 +205,7 @@
                         usersDiv.innerHTML = '';
                         userSet.forEach(userEmail => {
                             const userItem = document.createElement('div');
-                            userItem.textContent = userEmail;
+                            userItem.textContent = formatSender(userEmail);
                             userItem.className = 'user-item';
                             userItem.onclick = () => loadMessages(userEmail);
                             usersDiv.appendChild(userItem);
@@ -228,9 +228,14 @@
             });
         }
 
+        function formatSender(sender) {
+          const pattern = /(.+)__AT__(.+)__DOT__(.+)/;
+          return sender.replace(pattern, (match, p1, p2, p3) => `${p1}@@${p2}.${p3}`);
+        }
+
         function displayMessage(message) {
             const messageElement = document.createElement('div');
-            messageElement.textContent = `${message.sender}: ${message.text}`;
+            messageElement.textContent = `${formatSender(message.sender)}: ${message.text}`;
             messageElement.className = 'message';
 
             if (message.sender === currentUserEmail) {

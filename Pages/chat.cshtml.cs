@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Eduhunt.Pages
 {
-    public class chatModel : PageModel
+    public class ChatModel : PageModel
     {
         public string UserEmail { get; set; }
         public string ConvertedUserEmail { get; set; }
@@ -13,13 +13,6 @@ namespace Eduhunt.Pages
         {
             if (string.IsNullOrEmpty(email)) return email;
             return email.Replace("@", "__AT__").Replace(".", "__DOT__");
-        }
-
-        // Method to restore the email from the converted format
-        public string RestoreEmail(string convertedEmail)
-        {
-            if (string.IsNullOrEmpty(convertedEmail)) return convertedEmail;
-            return convertedEmail.Replace("__AT__", "@").Replace("__DOT__", ".");
         }
 
         public void OnGet()
