@@ -78,6 +78,9 @@
                                 {
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         <span>@mentor.Email</span>
+                                        <button type="button" class="btn btn-sm btn-secondary chat-button" data-mentor-email="@mentor.Email" data-sender-email="@Model.UserEmail">
+                                            Chat
+                                        </button>
                                         <button type="button" class="btn btn-sm btn-primary toggle-roadmap" data-mentor-id="@mentor.Id" aria-label="View Roadmap">
                                             <i class="bi bi-eye"></i> View Roadmap
                                         </button>
@@ -130,104 +133,159 @@
 </div>
 
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
-    @if (Model.IsMentor && Model.CanAddStep)
-    {
-        <script>
-            let stepIndex = @Model.Roadmaps.Count;
 
-            document.getElementById('add-step').addEventListener('click', function () {
-                const roadmapSteps = document.getElementById('roadmap-steps');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
-                const stepDiv = document.createElement('div');
-                stepDiv.classList.add('card', 'mb-3', 'step-card');
-                stepDiv.setAttribute('data-index', stepIndex);
+        document.querySelectorAll('.chat-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const mentorEmail = this.getAttribute('data-mentor-email');
+                const senderEmail = this.getAttribute('data-sender-email');
 
-                stepDiv.innerHTML = `
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <h5 class="card-title">Step ${stepIndex + 1}</h5>
-                                                    <button type="button" class="btn btn-danger btn-sm remove-step" aria-label="Delete Step">
-                                                        <i class="bi bi-trash"></i> Delete Step
-                                                    </button>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="Roadmaps_${stepIndex}__Title" class="form-label">Title <span class="text-danger">*</span></label>
-                                                    <input type="text" name="Roadmaps[${stepIndex}].Title" class="form-control" id="Roadmaps_${stepIndex}__Title" required />
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="Roadmaps_${stepIndex}__Description" class="form-label">Description</label>
-                                                    <textarea name="Roadmaps[${stepIndex}].Description" class="form-control" id="Roadmaps_${stepIndex}__Description" rows="3"></textarea>
-                                                </div>
-                                            </div>
-                                        `;
-                roadmapSteps.appendChild(stepDiv);
-                stepIndex++;
-                updateStepNumbers();
+                sendInitialMessage(senderEmail, mentorEmail);
+            });
+        });
+
+        function sendInitialMessage(sender, recipient) {
+            sender = sender.replace("@@", "__AT__").replace(/\./g, "__DOT__");
+            recipient = recipient.replace("@@", "__AT__").replace(/\./g, "__DOT__");
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyDXaRAI4qQeCpX5K78-aDTAZVX0nUeHNwc",
+                authDomain: "test-6c526.firebaseapp.com",
+                databaseURL: "https://test-6c526-default-rtdb.asia-southeast1.firebasedatabase.app",
+                projectId: "test-6c526",
+                storageBucket: "test-6c526.appspot.com",
+                messagingSenderId: "647478675126",
+                appId: "1:647478675126:web:811f4d5669c1d72e4e4817",
+                measurementId: "G-H6GSLEHGKK"
+            };
+
+            // Initialize Firebase App and Database
+            const app = initializeApp(firebaseConfig);
+            const database = getDatabase(app);
+
+            const defaultMessage = "Hi Mentor, I want to connect.";
+            const timestamp = new Date().toLocaleString();
+
+            const senderRef = ref(database, `messages/${sender}/${recipient}`);
+            const recipientRef = ref(database, `messages/${recipient}/${sender}`);
+
+            const messageData = {
+                text: defaultMessage,
+                sender: sender,
+                timestamp: timestamp
+            };
+
+            push(senderRef, messageData).catch(error => {
+                console.error("Error sending message to sender thread:", error);
             });
 
-            // Event delegation for removing steps
-            document.getElementById('roadmap-steps').addEventListener('click', function (e) {
-                if (e.target.closest('button.remove-step')) {
-                    e.target.closest('.step-card').remove();
+            push(recipientRef, messageData).catch(error => {
+                console.error("Error sending message to recipient thread:", error);
+            });
+
+            alert("Message sent to mentor!");
+        }
+
+        @if (Model.IsMentor && Model.CanAddStep)
+        {
+            <text>
+                let stepIndex = @Model.Roadmaps.Count;
+
+                document.getElementById('add-step').addEventListener('click', function () {
+                    const roadmapSteps = document.getElementById('roadmap-steps');
+
+                    const stepDiv = document.createElement('div');
+                    stepDiv.classList.add('card', 'mb-3', 'step-card');
+                    stepDiv.setAttribute('data-index', stepIndex);
+
+                    stepDiv.innerHTML = `
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title">Step ${stepIndex + 1}</h5>
+                                <button type="button" class="btn btn-danger btn-sm remove-step" aria-label="Delete Step">
+                                    <i class="bi bi-trash"></i> Delete Step
+                                </button>
+                            </div>
+                            <div class="mb-3">
+                                <label for="Roadmaps_${stepIndex}__Title" class="form-label">Title <span class="text-danger">*</span></label>
+                                <input type="text" name="Roadmaps[${stepIndex}].Title" class="form-control" id="Roadmaps_${stepIndex}__Title" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="Roadmaps_${stepIndex}__Description" class="form-label">Description</label>
+                                <textarea name="Roadmaps[${stepIndex}].Description" class="form-control" id="Roadmaps_${stepIndex}__Description" rows="3"></textarea>
+                            </div>
+                        </div>
+                    `;
+                    roadmapSteps.appendChild(stepDiv);
+                    stepIndex++;
                     updateStepNumbers();
+                });
+
+                document.getElementById('roadmap-steps').addEventListener('click', function (e) {
+                    if (e.target.closest('button.remove-step')) {
+                        e.target.closest('.step-card').remove();
+                        updateStepNumbers();
+                    }
+                });
+
+                function updateStepNumbers() {
+                    const stepCards = document.querySelectorAll('.step-card');
+                    stepCards.forEach((card, index) => {
+                        card.setAttribute('data-index', index);
+                        card.querySelector('.card-title').textContent = `Step ${index + 1}`;
+
+                        const titleInput = card.querySelector('input[name^="Roadmaps["]');
+                        const descriptionInput = card.querySelector('textarea[name^="Roadmaps["]');
+
+                        if (titleInput) {
+                            titleInput.name = `Roadmaps[${index}].Title`;
+                            titleInput.id = `Roadmaps_${index}__Title`;
+                        }
+
+                        if (descriptionInput) {
+                            descriptionInput.name = `Roadmaps[${index}].Description`;
+                            descriptionInput.id = `Roadmaps_${index}__Description`;
+                        }
+                    });
+                    stepIndex = stepCards.length;
                 }
-            });
 
-            // Function to update step numbers and input names/ids
-            function updateStepNumbers() {
-                const stepCards = document.querySelectorAll('.step-card');
-                stepCards.forEach((card, index) => {
-                    card.setAttribute('data-index', index);
-                    card.querySelector('.card-title').textContent = `Step ${index + 1}`;
+                updateStepNumbers();
+            </text>
+        }
+        else
+        {
+            <text>
+                document.querySelectorAll('.toggle-roadmap').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const mentorId = this.getAttribute('data-mentor-id');
+                        const roadmapContainer = document.getElementById(`roadmap-${mentorId}`);
 
-                    const titleInput = card.querySelector('input[name^="Roadmaps["]');
-                    const descriptionInput = card.querySelector('textarea[name^="Roadmaps["]');
+                        if (roadmapContainer.style.display === 'none' || roadmapContainer.style.display === '') {
+                            document.querySelectorAll('.roadmap-container').forEach(container => {
+                                container.style.display = 'none';
+                            });
 
-                    if (titleInput) {
-                        titleInput.name = `Roadmaps[${index}].Title`;
-                        titleInput.id = `Roadmaps_${index}__Title`;
-                    }
+                            document.querySelectorAll('.toggle-roadmap').forEach(btn => {
+                                btn.innerHTML = '<i class="bi bi-eye"></i> View Roadmap';
+                            });
 
-                    if (descriptionInput) {
-                        descriptionInput.name = `Roadmaps[${index}].Description`;
-                        descriptionInput.id = `Roadmaps_${index}__Description`;
-                    }
+                            roadmapContainer.style.display = 'block';
+                            this.innerHTML = '<i class="bi bi-eye-slash"></i> Hide Roadmap';
+                        } else {
+                            roadmapContainer.style.display = 'none';
+                            this.innerHTML = '<i class="bi bi-eye"></i> View Roadmap';
+                        }
+                    });
                 });
-                stepIndex = stepCards.length;
-            }
+            </text>
+        }
+    </script>
+}
 
-            // Initialize step numbers on page load
-            updateStepNumbers();
-        </script>
-    }
-    else
-    {
-        <script>
-            document.querySelectorAll('.toggle-roadmap').forEach(button => {
-                button.addEventListener('click', function () {
-                    const mentorId = this.getAttribute('data-mentor-id');
-                    const roadmapContainer = document.getElementById(`roadmap-${mentorId}`);
-
-                    if (roadmapContainer.style.display === 'none' || roadmapContainer.style.display === '') {
-                        // Hide all other roadmaps
-                        document.querySelectorAll('.roadmap-container').forEach(container => {
-                            container.style.display = 'none';
-                        });
-                        // Reset all buttons' text
-                        document.querySelectorAll('.toggle-roadmap').forEach(btn => {
-                            btn.innerHTML = '<i class="bi bi-eye"></i> View Roadmap';
-                        });
-
-                        // Show the selected roadmap
-                        roadmapContainer.style.display = 'block';
-                        this.innerHTML = '<i class="bi bi-eye-slash"></i> Hide Roadmap';
-                    } else {
-                        roadmapContainer.style.display = 'none';
-                        this.innerHTML = '<i class="bi bi-eye"></i> View Roadmap';
-                    }
-                });
-            });
-        </script>
-    }
 }

@@ -14,6 +14,8 @@ namespace Eduhunt.Pages
         private readonly ProfileService _profileService;
         private readonly ApplicationUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        public string? UserEmail { get; set; }
+
 
         public RoadmapModel(
             RoadmapService roadmapService,
@@ -49,6 +51,7 @@ namespace Eduhunt.Pages
             }
 
             var userEmail = _profileService.GetEmailFromToken(idToken);
+            UserEmail = userEmail;
             IsMentor = await _userService.IsMentorAsync(userEmail);
 
             var userId = _userService.GetUserId(userEmail);

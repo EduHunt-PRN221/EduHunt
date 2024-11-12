@@ -5,9 +5,11 @@
 @{
     var httpContext = HttpContextAccessor.HttpContext!;
     var isAuthenticated = httpContext.Request.Cookies.ContainsKey("IdToken");
+    var hasEmailCookie = httpContext.Request.Cookies.ContainsKey("email");
     var profileService = ServiceProvider.GetRequiredService<ProfileService>();
     var userEmail = string.Empty;
-    if (isAuthenticated)
+
+    if (isAuthenticated && hasEmailCookie)
     {
         var idToken = httpContext.Request.Cookies["IdToken"];
         userEmail = profileService.GetEmailFromToken(idToken!);
@@ -45,9 +47,12 @@
                 <a href="/roadmap" class="text-decoration-none text-secondary mx-3 @(Context.Request.Path == "/roadmap" ? "font-weight-bold border-bottom border-dark" : "")">
                     Roadmap
                 </a>
-                <a href="/chat" class="text-decoration-none text-secondary mx-3 @(Context.Request.Path == "/chat" ? "font-weight-bold border-bottom border-dark" : "")">
-                    Chat
-                </a>
+                @if (hasEmailCookie)
+                {
+                    <a href="/chat" class="text-decoration-none text-secondary mx-3 @(Context.Request.Path == "/chat" ? "font-weight-bold border-bottom border-dark" : "")">
+                        Chat
+                    </a>
+                }
                 <a href="/aboutus" class="text-decoration-none text-secondary mx-3 @(Context.Request.Path == "/aboutus" ? "font-weight-bold border-bottom border-dark" : "")">
                     About us
                 </a>
@@ -81,7 +86,7 @@
         </nav>
     </header>
 
-    <div class="">
+    <div class="container">
         <main role="main">
             <partial name="_Notification" />
             @RenderBody()

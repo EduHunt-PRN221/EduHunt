@@ -154,13 +154,14 @@
             <div id="users"></div>
         </div>
         <div id="chat-box">
-            <h3>Chat</h3>
+            <h3>Chat with <span id="recipientEmail">Select a user</span></h3>
             <div id="messages"></div>
             <div id="sendMessageContainer">
                 <input type="text" id="messageInput" placeholder="Type a message..." />
                 <button id="sendButton">Send</button>
             </div>
         </div>
+
     </div>
 
     <script type="module">
@@ -221,12 +222,16 @@
             selectedUser = userEmail;
             messagesDiv.innerHTML = '';
 
+            // Cập nhật email người nhận trên giao diện
+            document.getElementById('recipientEmail').textContent = formatSender(userEmail);
+
             const messagesRef = ref(database, `messages/${currentUserEmail}/${userEmail}`);
             onChildAdded(messagesRef, snapshot => {
                 const message = snapshot.val();
                 displayMessage(message);
             });
         }
+
 
         function formatSender(sender) {
           const pattern = /(.+)__AT__(.+)__DOT__(.+)/;
