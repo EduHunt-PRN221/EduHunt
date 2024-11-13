@@ -41,10 +41,15 @@
                     {
                         <div class="mb-4">
                             <label for="uploadCertificate" class="form-label">Upload Certificate</label>
-                            <input id="uploadCertificate" asp-for="UploadCertificate" type="file" class="form-control" accept="image/*" onchange="displaySelectedImage(event, 'certificateImage')" />
+                            <input @(Model.IsUpload ? "hidden" : "") id="uploadCertificate" asp-for="UploadCertificate" type="file" class="form-control" accept="image/*" onchange="displaySelectedImage(event, 'certificateImage')" />
                             <img id="certificateImage" src="@Model.Profile?.CertificateImage" alt="Certificate" class="img-thumbnail mt-2" style="max-width: 200px; display: @(string.IsNullOrEmpty(Model.Profile?.CertificateImage) ? "none" : "block");" />
+                            @if (Model.IsApproved)
+                            {
+                                <span class="badge bg-success mt-2">Approved</span>
+                            }
                         </div>
                     }
+
                     @if (Model.IsVIP)
                     {
                         <div class="alert alert-warning fs-4 text-center py-2 fw-bold mt-2 mb-4">

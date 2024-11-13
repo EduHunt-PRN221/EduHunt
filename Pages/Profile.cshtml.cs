@@ -21,6 +21,8 @@ namespace Eduhunt.Pages
         [BindProperty]
         public IFormFile? UploadCertificate { get; set; }
 
+        public bool IsApproved { get; set; }
+        public bool IsUpload { get; set; }
         public bool IsVIP { get; set; }
         public bool IsMentor { get; set; }
         public bool IsStudent { get; set; }
@@ -108,6 +110,8 @@ namespace Eduhunt.Pages
         private async Task LoadUserProfile(string userEmail)
         {
             Profile = await _profileService.GetProfileByUserEmailAsync(userEmail) ?? new Profile();
+            IsApproved = await _profileService.IsApprovedAsync(userEmail);
+            IsUpload = await _profileService.IsUploadAsync(userEmail);
             IsVIP = await _userService.GetVIPStatusByEmailAsync(userEmail);
             IsMentor = await _userService.IsMentorAsync(userEmail);
             IsStudent = await _userService.IsStudentAsync(userEmail);

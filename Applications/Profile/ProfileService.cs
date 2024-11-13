@@ -25,6 +25,25 @@ namespace Eduhunt.Applications.ProfileService
             return jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value ?? string.Empty;
         }
 
+        public async Task<bool> IsUploadAsync(string email)
+        {
+            var upload = await _context.Profile.Where(x=>x.Email == email).Select(x=>x.CertificateImage).SingleOrDefaultAsync();
+            if (upload != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> IsApprovedAsync(string email)
+        {
+            var approved = await _context.Profile.Where(x => x.Email == email).Select(x => x.IsApprove).SingleOrDefaultAsync();
+            return approved;
+        }
+
         //get profile by user id
         public async Task<Profile?> GetProfileByUserIdAsync(string? userId)
         {
